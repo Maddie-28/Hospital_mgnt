@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Hospital Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eef4f1;
+      --surface: rgba(255, 255, 255, 0.86);
+      --surface-strong: #ffffff;
+      --panel: #123c36;
+      --panel-soft: #1c5a52;
+      --accent: #0f766e;
+      --accent-strong: #0b5f59;
+      --text: #142522;
+      --muted: #5f746f;
+      --border: rgba(20, 37, 34, 0.12);
+      --danger: #b42318;
+      --shadow: 0 28px 70px rgba(18, 60, 54, 0.16);
+    }
+
+    body[data-theme="dark"] {
+      --bg: #091412;
+      --surface: rgba(14, 28, 25, 0.86);
+      --surface-strong: #132421;
+      --panel: #0b231f;
+      --panel-soft: #12332e;
+      --accent: #2dd4bf;
+      --accent-strong: #14b8a6;
+      --text: #e7f6f2;
+      --muted: #a0b9b2;
+      --border: rgba(164, 212, 199, 0.16);
+      --shadow: 0 28px 70px rgba(1, 10, 9, 0.34);
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(18, 60, 54, 0.18), transparent 30%),
+        linear-gradient(135deg, #edf4ef 0%, #f8faf8 48%, #eef6f3 100%);
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      overflow-x: hidden;
+    }
+
+    body[data-theme="dark"] {
+      background:
+        radial-gradient(circle at top left, rgba(45, 212, 191, 0.14), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(19, 51, 46, 0.3), transparent 30%),
+        linear-gradient(135deg, #06110f 0%, #0b1715 48%, #10211d 100%);
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.4);
+      filter: blur(12px);
+      z-index: 0;
+    }
+
+    body::before {
+      width: 320px;
+      height: 320px;
+      top: -120px;
+      right: -80px;
+    }
+
+    body::after {
+      width: 260px;
+      height: 260px;
+      left: -100px;
+      bottom: -80px;
+    }
+
+    .login-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      border-radius: 30px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: var(--shadow);
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(18px);
+    }
+
+    .login-showcase {
+      background:
+        linear-gradient(160deg, rgba(8, 34, 31, 0.72), rgba(15, 118, 110, 0.3)),
+        linear-gradient(135deg, #113c36 0%, #20544e 48%, #0f766e 100%);
+      color: #f5fbfa;
+      padding: 54px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 720px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-showcase::before,
+    .login-showcase::after {
+      content: '';
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .login-showcase::before {
+      width: 280px;
+      height: 280px;
+      right: -80px;
+      top: 90px;
+    }
+
+    .login-showcase::after {
+      width: 220px;
+      height: 220px;
+      left: -60px;
+      bottom: 70px;
+    }
+
+    .brand-row,
+    .showcase-copy,
+    .showcase-grid { position: relative; z-index: 1; }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .brand-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 14px;
+    }
+
+    .brand-text h2 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text p {
+      margin: 4px 0 0;
+      color: rgba(245, 251, 250, 0.72);
+      font-size: 13px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 18px;
+    }
+
+    .showcase-copy h1 {
+      font-size: clamp(40px, 5vw, 62px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      max-width: 520px;
+    }
+
+    .showcase-copy p {
+      margin-top: 20px;
+      max-width: 480px;
+      color: rgba(245, 251, 250, 0.78);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      padding: 18px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .metric span {
+      display: block;
+      font-size: 12px;
+      color: rgba(245, 251, 250, 0.72);
+      margin-bottom: 8px;
+    }
+
+    .metric strong {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .login-panel {
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      padding: 54px 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: min(420px, 100%);
+      background: var(--surface-strong);
+      border: 1px solid rgba(20, 37, 34, 0.08);
+      border-radius: 28px;
+      padding: 34px 30px 28px;
+      box-shadow: 0 20px 52px rgba(18, 60, 54, 0.12);
+    }
+
+    .theme-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.1);
+      color: #f5fbfa;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .theme-switch:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .theme-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .theme-switch-label {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .theme-switch-track {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      transition: background .22s ease, box-shadow .22s ease;
+    }
+
+    .theme-switch-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 8px 16px rgba(10, 27, 24, .18);
+      transition: transform .22s ease, background .22s ease;
+    }
+
+    .theme-switch input:checked + .theme-switch-track {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+    }
+
+    .theme-switch input:checked + .theme-switch-track .theme-switch-thumb {
+      transform: translateX(20px);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .card-kicker {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      background: #14b8a6;
+      box-shadow: 0 0 0 8px rgba(20, 184, 166, 0.12);
+    }
+
+    h1 {
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 10px;
+    }
+
+    .subtext {
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .auth-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #f3f7f5;
+      border: 1px solid rgba(20, 37, 34, 0.08);
+      border-radius: 18px;
+      padding: 6px;
+      margin-bottom: 22px;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: none;
+      margin: 0;
+    }
+
+    .auth-tab.active {
+      background: #ffffff;
+      color: var(--text);
+      box-shadow: 0 10px 18px rgba(18, 60, 54, 0.08);
+    }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4f645f;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 15px;
+      font: inherit;
+      background: #fbfdfc;
+      color: var(--text);
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(15, 118, 110, 0.55);
+      box-shadow: 0 0 0 5px rgba(15, 118, 110, 0.1);
+      transform: translateY(-1px);
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      padding: 14px 16px;
+      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 16px 30px rgba(15, 118, 110, 0.22);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 34px rgba(15, 118, 110, 0.26);
+      filter: brightness(1.02);
+    }
+
+    .err {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 10px;
+      min-height: 18px;
+      font-weight: 600;
+    }
+
+    .hint {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f2f8f6;
+      border: 1px solid rgba(20, 37, 34, 0.08);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .hint b {
+      color: var(--text);
+      font-family: 'Source Code Pro', monospace;
+      font-weight: 500;
+    }
+
+    .register-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #f5fbf9;
+      border: 1px dashed rgba(15, 118, 110, 0.22);
+      color: #35514c;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    body[data-theme="dark"] .login-shell,
+    body[data-theme="dark"] .card {
+      border-color: rgba(164, 212, 199, 0.14);
+      box-shadow: var(--shadow);
+    }
+
+    body[data-theme="dark"] .login-shell {
+      background: rgba(9, 20, 18, 0.48);
+    }
+
+    body[data-theme="dark"] .login-showcase {
+      background:
+        linear-gradient(160deg, rgba(4, 18, 16, 0.82), rgba(20, 184, 166, 0.2)),
+        linear-gradient(135deg, #081816 0%, #0c2522 48%, #11544c 100%);
+    }
+
+    body[data-theme="dark"] .auth-switch,
+    body[data-theme="dark"] .hint,
+    body[data-theme="dark"] .register-note,
+    body[data-theme="dark"] input,
+    body[data-theme="dark"] select {
+      background: rgba(18, 39, 34, 0.92);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] .auth-tab.active {
+      background: rgba(231, 246, 242, 0.08);
+      color: var(--text);
+      box-shadow: 0 10px 18px rgba(1, 10, 9, 0.2);
+    }
+
+    body[data-theme="dark"] label,
+    body[data-theme="dark"] .register-note,
+    body[data-theme="dark"] .hint b {
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] .subtext,
+    body[data-theme="dark"] .hint,
+    body[data-theme="dark"] .brand-text p,
+    body[data-theme="dark"] .showcase-copy p,
+    body[data-theme="dark"] .metric span {
+      color: var(--muted);
+    }
+
+    body[data-theme="dark"] .theme-switch {
+      background: rgba(18, 39, 34, 0.74);
+      border-color: rgba(164, 212, 199, 0.16);
+      color: #d8f7f0;
+    }
+
+    @media (max-width: 960px) {
+      .login-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .login-showcase {
+        min-height: auto;
+        padding: 36px 30px;
+      }
+
+      .login-panel {
+        padding: 30px 18px 22px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 18px 12px; }
+      .login-showcase { padding: 28px 22px; }
+      .showcase-grid { grid-template-columns: 1fr; }
+      .card { padding: 28px 20px 22px; border-radius: 24px; }
+      h1 { font-size: 29px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-shell">
+    <section class="login-showcase">
+      <div class="brand-row">
+        <div class="brand-heading">
+          <div class="brand-mark">SH</div>
+          <div class="brand-text">
+            <h2>Smart Hospital</h2>
+            <p>Unified healthcare operations platform</p>
+          </div>
+        </div>
+        <label class="theme-switch" for="theme-toggle">
+          <span class="theme-switch-label" id="theme-toggle-label">Dark Mode</span>
+          <input id="theme-toggle" type="checkbox" onchange="toggleTheme()" />
+          <span class="theme-switch-track"><span class="theme-switch-thumb"></span></span>
+        </label>
+      </div>
+
+      <div class="showcase-copy">
+        <div class="eyebrow">Hospital Administration Suite</div>
+        <h1>Care delivery, staffing, and patient flow in one place.</h1>
+        <p>
+          Access appointments, admissions, pharmacy, billing, and clinical records through a secure portal built for
+          daily hospital operations.
+        </p>
+      </div>
+
+      <div class="showcase-grid">
+        <div class="metric">
+          <span>Modules</span>
+          <strong>15+</strong>
+        </div>
+        <div class="metric">
+          <span>Access</span>
+          <strong>Role-Based</strong>
+        </div>
+        <div class="metric">
+          <span>Workflow</span>
+          <strong>Real-Time</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="login-panel">
+      <div class="card">
+        <div class="card-top">
+          <div class="card-kicker">Secure Sign In</div>
+          <div class="status-dot" aria-hidden="true"></div>
+        </div>
+        <h1>Welcome back</h1>
+        <p class="subtext" id="auth-subtext">Choose your role and continue to the Smart Hospital workspace.</p>
+
+        <div class="auth-switch">
+          <button class="auth-tab active" id="tab-login" type="button" onclick="switchAuth('login')">Login</button>
+          <button class="auth-tab" id="tab-register" type="button" onclick="switchAuth('register')">Register</button>
+        </div>
+
+        <div class="auth-panel active" id="panel-login">
+          <div class="field">
+            <label>Role</label>
+            <select id="role">
+              <option value="admin">admin</option>
+              <option value="doctor">doctor</option>
+              <option value="patient">patient</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Username</label>
+            <input id="username" placeholder="e.g. rakesh.agarwal" />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input id="password" type="password" placeholder="Enter password" />
+          </div>
+          <button type="button" onclick="login()">Login</button>
+          <div class="hint">Default admin access: <b>admin / admin123</b></div>
+        </div>
+
+        <div class="auth-panel" id="panel-register">
+          <div class="field">
+            <label>Blood Group</label>
+            <select id="reg-blood">
+              <option value="">Select...</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>O+</option>
+              <option>O-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Full Name</label>
+            <input id="reg-name" placeholder="Enter your full name" />
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Username</label>
+              <input id="reg-username" placeholder="Choose a username" />
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <input id="reg-password" type="password" placeholder="Create a password" />
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Date of Birth</label>
+              <input id="reg-dob" type="date" />
+            </div>
+            <div class="field">
+              <label>Gender</label>
+              <select id="reg-gender">
+                <option value="">Select...</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Others</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Phone</label>
+              <input id="reg-phone" placeholder="10 digits" />
+            </div>
+            <div class="field">
+              <label>Age</label>
+              <input id="reg-age" type="number" placeholder="Optional" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Address</label>
+            <input id="reg-address" placeholder="Optional" />
+          </div>
+          <div class="field">
+            <label>Medical History</label>
+            <input id="reg-history" placeholder="Optional" />
+          </div>
+          <button type="button" onclick="registerPatient()">Create Patient Account</button>
+          <div class="register-note" id="register-note">New patients are registered directly into the database and receive an auto-generated patient ID.</div>
+        </div>
+
+        <div class="err" id="err"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Match the backend default port from server.js.
+    var API = 'http://localhost:3000';
+    var theme = localStorage.getItem('shTheme') || 'light';
+
+    function applyTheme(nextTheme) {
+      theme = nextTheme === 'dark' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('shTheme', theme);
+      var toggle = document.getElementById('theme-toggle');
+      if (toggle) toggle.checked = theme === 'dark';
+      var label = document.getElementById('theme-toggle-label');
+      if (label) label.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    }
+
+    function toggleTheme() {
+      applyTheme(theme === 'dark' ? 'light' : 'dark');
+    }
+
+    applyTheme(theme);
+
+    // If already logged in, continue with the active session in this tab.
+    if (localStorage.getItem('shSession')) window.location.href = 'index.html';
+
+    function v(id) { return document.getElementById(id).value.trim(); }
+    function switchAuth(mode) {
+      var isRegister = mode === 'register';
+      document.getElementById('tab-login').classList.toggle('active', !isRegister);
+      document.getElementById('tab-register').classList.toggle('active', isRegister);
+      document.getElementById('panel-login').classList.toggle('active', !isRegister);
+      document.getElementById('panel-register').classList.toggle('active', isRegister);
+      document.getElementById('auth-subtext').textContent = isRegister
+        ? 'Register as a new patient and get a database-generated patient ID instantly.'
+        : 'Choose your role and continue to the Smart Hospital workspace.';
+      document.getElementById('err').textContent = '';
+    }
+    function login() {
+      document.getElementById('err').textContent = '';
+      var body = { role: v('role'), username: v('username'), password: v('password') };
+      if (!body.username || !body.password) {
+        document.getElementById('err').textContent = 'Enter username and password';
+        return;
+      }
+      fetch(API + '/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.error || !d.user) {
+            document.getElementById('err').textContent = d.error || 'Login failed';
+            return;
+          }
+          localStorage.setItem('shSession', JSON.stringify(d.user));
+          window.location.href = 'index.html';
+        })
+        .catch(function (e) { document.getElementById('err').textContent = e.message; });
+    }
+    function registerPatient() {
+      document.getElementById('err').textContent = '';
+      var body = {
+        name: v('reg-name'),
+        username: v('reg-username'),
+        password: v('reg-password'),
+        role: 'patient',
+        dob: v('reg-dob'),
+        gender: v('reg-gender'),
+        phone: v('reg-phone') || null,
+        age: v('reg-age') || null,
+        address: v('reg-address') || null,
+        blood_group: v('reg-blood'),
+        medical_history: v('reg-history') || null
+      };
+      if (!body.name || !body.username || !body.password || !body.dob || !body.gender || !body.blood_group) {
+        document.getElementById('err').textContent = 'Fill all required registration fields';
+        return;
+      }
+      fetch(API + '/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.error) {
+            document.getElementById('err').textContent = d.error;
+            return;
+          }
+          document.getElementById('register-note').textContent = 'Registration successful. Your patient ID is ' + (d.patient_id || d.id) + '. You can log in now using your new username and password.';
+          document.getElementById('username').value = body.username;
+          document.getElementById('password').value = body.password;
+          document.getElementById('role').value = 'patient';
+          switchAuth('login');
+        })
+        .catch(function (e) { document.getElementById('err').textContent = e.message; });
+    }
+  </script>
+</body>
+</html>

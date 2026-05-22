@@ -1,0 +1,4363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Hospital Portal</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f2f5f1;
+      --bg-soft: #f9fbf9;
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-strong: #ffffff;
+      --sidebar-bg: linear-gradient(180deg, #0d312d 0%, #123c36 48%, #173e39 100%);
+      --sidebar-w: 272px;
+      --accent: #0f766e;
+      --accent2: #14b8a6;
+      --success: #15803d;
+      --warning: #c27803;
+      --danger: #b42318;
+      --text: #132220;
+      --muted: #637570;
+      --border: rgba(19, 34, 32, 0.1);
+      --radius: 22px;
+      --radius-sm: 16px;
+      --shadow: 0 24px 60px rgba(12, 41, 38, 0.08);
+      --shadow-soft: 0 12px 36px rgba(12, 41, 38, 0.06);
+    }
+
+    body[data-theme="dark"] {
+      --bg: #091412;
+      --bg-soft: #0f1d1a;
+      --surface: rgba(14, 28, 25, 0.88);
+      --surface-strong: #132421;
+      --sidebar-bg: linear-gradient(180deg, #061816 0%, #0a2421 48%, #0d2b27 100%);
+      --accent: #2dd4bf;
+      --accent2: #5eead4;
+      --text: #e7f6f2;
+      --muted: #9eb7b0;
+      --border: rgba(164, 212, 199, 0.14);
+      --shadow: 0 24px 60px rgba(1, 10, 9, 0.42);
+      --shadow-soft: 0 12px 36px rgba(1, 10, 9, 0.28);
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Instrument Sans', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(20, 184, 166, .08), transparent 24%),
+        radial-gradient(circle at right 12%, rgba(15, 118, 110, .08), transparent 22%),
+        linear-gradient(180deg, #eef3ef 0%, #f5f8f5 48%, #edf3f1 100%);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden
+    }
+
+    body[data-theme="dark"] {
+      background:
+        radial-gradient(circle at top left, rgba(45, 212, 191, .14), transparent 24%),
+        radial-gradient(circle at right 12%, rgba(94, 234, 212, .1), transparent 22%),
+        linear-gradient(180deg, #06110f 0%, #0b1715 48%, #10211d 100%);
+    }
+
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 0
+    }
+
+    body::before {
+      width: 320px;
+      height: 320px;
+      top: -120px;
+      right: -70px;
+      background: rgba(20, 184, 166, .08);
+      filter: blur(6px)
+    }
+
+    body::after {
+      width: 260px;
+      height: 260px;
+      bottom: 4%;
+      left: -80px;
+      background: rgba(15, 118, 110, .09);
+      filter: blur(10px)
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      bottom: 18px;
+      overflow-y: auto;
+      z-index: 100;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      box-shadow: 0 28px 70px rgba(6, 23, 21, .28);
+      padding-bottom: 20px
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 5px
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, .18);
+      border-radius: 999px
+    }
+
+    .sb-header {
+      padding: 26px 22px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, .07)
+    }
+
+    .sb-logo {
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.03em
+    }
+
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .14);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em
+    }
+
+    .sb-caption {
+      margin-top: 4px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, .62)
+    }
+
+    .sb-logo span {
+      color: var(--accent2)
+    }
+
+    .sb-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      background: rgba(255, 255, 255, .09);
+      color: #dcfffa;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-family: 'Source Code Pro', monospace;
+      border: 1px solid rgba(255, 255, 255, .1)
+    }
+
+    .sb-pill::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #2dd4bf;
+      box-shadow: 0 0 0 6px rgba(45, 212, 191, .12)
+    }
+
+    .sb-label {
+      padding: 20px 22px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .3)
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 12px 4px;
+      padding: 12px 14px;
+      color: rgba(255, 255, 255, .76);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+      width: calc(100% - 24px);
+      text-align: left;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+      border-radius: 16px
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .06);
+      border-color: rgba(255, 255, 255, .07);
+      color: rgba(255, 255, 255, .95);
+      transform: translateX(3px)
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(20, 184, 166, .18), rgba(15, 118, 110, .26));
+      color: #fff;
+      border-color: rgba(138, 240, 223, .25);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04)
+    }
+
+    .nav-item .ic {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      opacity: .92
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: calc(var(--sidebar-w) + 36px);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      position: relative;
+      z-index: 1
+    }
+
+    .topbar {
+      background: rgba(255, 255, 255, .74);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, .55);
+      box-shadow: var(--shadow-soft);
+      margin: 18px 18px 0 0;
+      padding: 18px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 18px;
+      z-index: 50;
+      border-radius: 24px
+    }
+
+    .topbar-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -.05em
+    }
+
+    .topbar-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 5px
+    }
+
+    .topbar-date {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 11px;
+      color: #2d4a45;
+      background: rgba(15, 118, 110, .08);
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, .12)
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end
+    }
+
+    .user-chip {
+      font-size: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(15, 118, 110, .14);
+      border-radius: 999px;
+      color: #18403b;
+      background: rgba(15, 118, 110, .07);
+      font-weight: 600
+    }
+
+    .theme-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, .14);
+      background: rgba(15, 118, 110, .07);
+      color: #18403b;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+    }
+
+    .theme-switch:hover {
+      transform: translateY(-1px);
+      background: rgba(15, 118, 110, .12);
+    }
+
+    .theme-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .theme-switch-label {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .theme-switch-track {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, .2);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(15, 118, 110, .1);
+      transition: background .22s ease, box-shadow .22s ease;
+    }
+
+    .theme-switch-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 8px 16px rgba(10, 27, 24, .16);
+      transition: transform .22s ease, background .22s ease;
+    }
+
+    .theme-switch input:checked + .theme-switch-track {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+    }
+
+    .theme-switch input:checked + .theme-switch-track .theme-switch-thumb {
+      transform: translateX(20px);
+    }
+
+    .logout-btn {
+      border: none;
+      background: linear-gradient(135deg, var(--accent) 0%, #0b5f59 100%);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 11px 18px;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(15, 118, 110, .16);
+      transition: transform .18s ease, filter .18s ease
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03)
+    }
+
+    /* CONTENT */
+    .content {
+      padding: 22px 18px 28px 0
+    }
+
+    .page {
+      display: none
+    }
+
+    .page.active {
+      display: block;
+      animation: fadeIn .28s ease
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .dashboard-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr);
+      gap: 18px;
+      margin-bottom: 18px
+    }
+
+    .hero-banner,
+    .hero-panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .88), rgba(255, 255, 255, .7));
+      border: 1px solid rgba(255, 255, 255, .65);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px)
+    }
+
+    .hero-banner {
+      padding: 28px 28px 24px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero-banner::before,
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none
+    }
+
+    .hero-banner::before {
+      width: 220px;
+      height: 220px;
+      top: -70px;
+      right: -40px;
+      background: rgba(20, 184, 166, .12)
+    }
+
+    .hero-banner::after {
+      width: 180px;
+      height: 180px;
+      bottom: -80px;
+      left: 25%;
+      background: rgba(15, 118, 110, .09)
+    }
+
+    .hero-kicker,
+    .hero-banner h2,
+    .hero-banner p,
+    .hero-actions {
+      position: relative;
+      z-index: 1
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, .08);
+      color: #0b5f59;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .15em
+    }
+
+    .hero-kicker::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent2)
+    }
+
+    .hero-banner h2 {
+      margin-top: 16px;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: .98;
+      letter-spacing: -.06em;
+      max-width: 560px
+    }
+
+    .hero-banner p {
+      margin-top: 14px;
+      max-width: 600px;
+      color: #5b6d68;
+      font-size: 15px;
+      line-height: 1.7
+    }
+
+    .hero-actions {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    .hero-chip {
+      padding: 11px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .8);
+      border: 1px solid rgba(19, 34, 32, .08);
+      font-size: 13px;
+      color: #35514c;
+      box-shadow: 0 8px 22px rgba(12, 41, 38, .05)
+    }
+
+    .hero-panel {
+      padding: 24px 22px
+    }
+
+    .hero-panel h3 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em
+    }
+
+    .hero-panel p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6
+    }
+
+    .insight-list {
+      list-style: none;
+      margin-top: 20px;
+      display: grid;
+      gap: 12px
+    }
+
+    .insight-list li {
+      padding: 14px 14px 14px 16px;
+      border-radius: 18px;
+      background: rgba(15, 118, 110, .05);
+      border: 1px solid rgba(15, 118, 110, .08)
+    }
+
+    .insight-title {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #46615d
+    }
+
+    .insight-copy {
+      display: block;
+      margin-top: 6px;
+      color: #183b36;
+      font-size: 13px;
+      line-height: 1.55
+    }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .78));
+      border-radius: 24px;
+      padding: 20px 20px 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .68);
+      position: relative;
+      overflow: hidden;
+      min-height: 138px
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(15, 118, 110, .16), transparent 58%);
+      pointer-events: none
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      right: -12px;
+      bottom: -12px;
+      background: rgba(15, 118, 110, .08);
+      border-radius: 18px;
+      transform: rotate(18deg)
+    }
+
+    .stat-card.green::before {
+      background: linear-gradient(135deg, rgba(21, 128, 61, .18), transparent 58%)
+    }
+
+    .stat-card.orange::before {
+      background: linear-gradient(135deg, rgba(194, 120, 3, .18), transparent 58%)
+    }
+
+    .stat-card.red::before {
+      background: linear-gradient(135deg, rgba(180, 35, 24, .18), transparent 58%)
+    }
+
+    .stat-card.sky::before {
+      background: linear-gradient(135deg, rgba(20, 184, 166, .18), transparent 58%)
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -1.5px;
+      font-family: 'Source Code Pro', monospace;
+      line-height: 1;
+      position: relative;
+      z-index: 1
+    }
+
+    .stat-icon {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 24px;
+      opacity: .8;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, .7);
+      border: 1px solid rgba(15, 118, 110, .08);
+      border-radius: 14px;
+      z-index: 1
+    }
+
+    /* LAYOUT */
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: start
+    }
+
+    @media(max-width:1100px) {
+      .section-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* CARD */
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .76));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .68);
+      overflow: hidden;
+      backdrop-filter: blur(10px)
+    }
+
+    body[data-theme="dark"] .topbar,
+    body[data-theme="dark"] .hero-banner,
+    body[data-theme="dark"] .hero-panel,
+    body[data-theme="dark"] .stat-card,
+    body[data-theme="dark"] .card,
+    body[data-theme="dark"] .modal {
+      background: linear-gradient(180deg, rgba(18, 35, 31, .94), rgba(12, 24, 21, .92));
+      border-color: rgba(131, 191, 177, .16);
+      box-shadow: var(--shadow);
+    }
+
+    body[data-theme="dark"] .topbar-title,
+    body[data-theme="dark"] .card-title,
+    body[data-theme="dark"] .hero-banner h2,
+    body[data-theme="dark"] .hero-panel h3,
+    body[data-theme="dark"] .stat-value,
+    body[data-theme="dark"] .field label,
+    body[data-theme="dark"] th,
+    body[data-theme="dark"] td {
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] .topbar-sub,
+    body[data-theme="dark"] .hero-banner p,
+    body[data-theme="dark"] .hero-panel p,
+    body[data-theme="dark"] .insight-copy,
+    body[data-theme="dark"] .stat-label,
+    body[data-theme="dark"] .count-badge,
+    body[data-theme="dark"] .hint,
+    body[data-theme="dark"] .empty,
+    body[data-theme="dark"] .login-table th {
+      color: var(--muted);
+    }
+
+    body[data-theme="dark"] .topbar-date,
+    body[data-theme="dark"] .user-chip,
+    body[data-theme="dark"] .theme-switch,
+    body[data-theme="dark"] .hero-chip,
+    body[data-theme="dark"] .hero-kicker,
+    body[data-theme="dark"] .insight-list li,
+    body[data-theme="dark"] .stat-icon,
+    body[data-theme="dark"] .room-sel,
+    body[data-theme="dark"] input,
+    body[data-theme="dark"] select,
+    body[data-theme="dark"] textarea {
+      background: rgba(18, 39, 34, .92);
+      color: var(--text);
+      border-color: rgba(131, 191, 177, .16);
+    }
+
+    body[data-theme="dark"] .topbar-date,
+    body[data-theme="dark"] .user-chip,
+    body[data-theme="dark"] .theme-switch {
+      color: #d8f7f0;
+    }
+
+    body[data-theme="dark"] .theme-switch-track {
+      background: rgba(94, 234, 212, .16);
+      box-shadow: inset 0 0 0 1px rgba(164, 212, 199, .16);
+    }
+
+    body[data-theme="dark"] .theme-switch-thumb {
+      background: #e7f6f2;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, .28);
+    }
+
+    body[data-theme="dark"] .table-wrap,
+    body[data-theme="dark"] .table-scroll table,
+    body[data-theme="dark"] table,
+    body[data-theme="dark"] .modal-overlay {
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] tr {
+      border-color: rgba(131, 191, 177, .12);
+    }
+
+    body[data-theme="dark"] .logout-btn {
+      box-shadow: 0 14px 28px rgba(2, 16, 14, .38);
+    }
+
+    .card-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(19, 34, 32, .08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em
+    }
+
+    .card-body {
+      padding: 22px
+    }
+
+    /* TRIGGER NOTE */
+    .trigger-note {
+      background: linear-gradient(135deg, rgba(15, 118, 110, .08), rgba(20, 184, 166, .06));
+      border: 1px solid rgba(15, 118, 110, .12);
+      border-radius: 18px;
+      padding: 13px 16px;
+      font-size: 12px;
+      color: #0b5f59;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      box-shadow: var(--shadow-soft)
+    }
+
+    /* FORM */
+    .field {
+      margin-bottom: 14px
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      margin-bottom: 7px
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(19, 34, 32, .1);
+      border-radius: 16px;
+      font-size: 13px;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--text);
+      background: rgba(249, 252, 251, .96);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s, transform .18s
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 5px rgba(15, 118, 110, .1);
+      transform: translateY(-1px)
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 92px
+    }
+
+    .fr2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px 16px;
+      background: linear-gradient(135deg, var(--accent), #0b5f59);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Instrument Sans', sans-serif;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      margin-top: 4px;
+      box-shadow: 0 16px 30px rgba(15, 118, 110, .16)
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03)
+    }
+
+    .btn-cancel {
+      padding: 11px 16px;
+      background: rgba(19, 34, 32, .04);
+      color: var(--text);
+      border: 1px solid rgba(19, 34, 32, .08);
+      border-radius: 14px;
+      font-size: 12px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer
+    }
+
+    .btn-cancel:hover {
+      background: rgba(19, 34, 32, .08)
+    }
+
+    /* TABLE */
+    .table-toolbar {
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(19, 34, 32, .08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .search-input {
+      padding: 12px 14px 12px 40px;
+      border: 1px solid rgba(19, 34, 32, .1);
+      border-radius: 16px;
+      font-size: 13px;
+      font-family: 'Instrument Sans', sans-serif;
+      outline: none;
+      width: 260px;
+      max-width: 100%;
+      background: rgba(249, 252, 251, .96) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%23637570' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.868-3.834zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat 14px center;
+      transition: border-color .18s, box-shadow .18s
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 5px rgba(15, 118, 110, .08)
+    }
+
+    .rec-count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Source Code Pro', monospace;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(19, 34, 32, .04)
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      padding-bottom: 6px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px
+    }
+
+    thead tr {
+      background: rgba(15, 118, 110, .05);
+      border-bottom: 1px solid rgba(19, 34, 32, .08)
+    }
+
+    th {
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(19, 34, 32, .06);
+      vertical-align: middle;
+      font-size: 13px;
+    }
+
+    td:first-child {
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    tbody tr:hover td {
+      background: rgba(15, 118, 110, .04)
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    .empty {
+      text-align: center;
+      padding: 44px 26px;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Source Code Pro', monospace;
+      white-space: nowrap
+    }
+
+    .bg {
+      background: #dcfce7;
+      color: #15803d
+    }
+
+    .bo {
+      background: #ffedd5;
+      color: #c2410c
+    }
+
+    .br {
+      background: #fee2e2;
+      color: #b91c1c
+    }
+
+    .bb {
+      background: #dbeafe;
+      color: #1d4ed8
+    }
+
+    .bp {
+      background: #ede9fe;
+      color: #6d28d9
+    }
+
+    .bgr {
+      background: #edf2f1;
+      color: #46615d
+    }
+
+    /* ACTION BUTTONS */
+    .ab {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 11px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s ease, opacity .18s ease, filter .18s ease;
+      margin-right: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+    }
+
+    .icon-btn svg {
+      pointer-events: none;
+    }
+
+    .ab:hover {
+      opacity: 1;
+      filter: brightness(0.92);
+      transform: scale(1.05) translateY(-1px);
+    }
+
+    .ab-edit { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .ab-del { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .ab-treat { background: #fdf4ff; color: #c026d3; border: 1px solid #f5d0fe; }
+    .ab-book { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+    .admin-only { display: none; }
+    .login-table { font-size: 13px; width: 100%; }
+    .login-table th, .login-table td { padding: 12px 14px; border-bottom: 1px solid rgba(19, 34, 32, .08); text-align: left; }
+    .login-table th { color: var(--muted); font-weight: 600; }
+
+    /* ROOM SELECT */
+    .room-sel {
+      padding: 9px 12px;
+      border: 1px solid rgba(19, 34, 32, .1);
+      border-radius: 12px;
+      font-size: 11px;
+      font-family: 'Instrument Sans', sans-serif;
+      background: rgba(249, 252, 251, .96);
+      cursor: pointer
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 24, 22, .45);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      padding: 18px
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .97), rgba(248, 251, 250, .96));
+      border-radius: 26px;
+      padding: 28px;
+      width: 480px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 28px 80px rgba(7, 24, 22, .22);
+      border: 1px solid rgba(255, 255, 255, .75)
+    }
+
+    .modal h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(19, 34, 32, .08);
+      letter-spacing: -.03em
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap
+    }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(19, 34, 32, .94);
+      color: #fff;
+      padding: 13px 18px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 18px 40px rgba(7, 24, 22, .24);
+      display: none;
+      z-index: 9999;
+      animation: slideUp .2s ease;
+      max-width: min(92vw, 360px)
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(8px);
+        opacity: 0
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1
+      }
+    }
+
+    #toast.error {
+      background: var(--danger)
+    }
+
+    #toast.success {
+      background: var(--success)
+    }
+
+    .patient-bot {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 320;
+      display: none;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .patient-bot.open .patient-bot-panel {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .patient-bot-panel {
+      display: none;
+      width: min(360px, calc(100vw - 32px));
+      background: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(246, 250, 248, .94));
+      border: 1px solid rgba(19, 34, 32, .08);
+      border-radius: 24px;
+      box-shadow: 0 26px 70px rgba(12, 41, 38, .18);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(14px) scale(.98);
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .patient-bot-head {
+      padding: 16px 18px 14px;
+      background: linear-gradient(135deg, rgba(15, 118, 110, .12), rgba(20, 184, 166, .1));
+      border-bottom: 1px solid rgba(19, 34, 32, .08);
+    }
+
+    .patient-bot-head h3 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+
+    .patient-bot-head p {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .patient-bot-messages {
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 16px 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(249, 252, 251, .88);
+    }
+
+    .bot-msg {
+      max-width: 86%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .bot-msg.bot {
+      align-self: flex-start;
+      background: rgba(15, 118, 110, .08);
+      border: 1px solid rgba(15, 118, 110, .08);
+      color: #1b3c37;
+    }
+
+    .bot-msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent) 0%, #0b5f59 100%);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(15, 118, 110, .18);
+    }
+
+    .patient-bot-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 16px 14px;
+      background: rgba(249, 252, 251, .88);
+    }
+
+    .patient-bot-suggestions button {
+      width: auto;
+      margin-top: 0;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, .08);
+      color: #174540;
+      border: 1px solid rgba(15, 118, 110, .08);
+      box-shadow: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .patient-bot-suggestions button:hover {
+      box-shadow: none;
+      filter: none;
+      background: rgba(15, 118, 110, .12);
+    }
+
+    .patient-bot-compose {
+      display: flex;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(19, 34, 32, .08);
+      background: rgba(255, 255, 255, .96);
+    }
+
+    .patient-bot-compose input {
+      margin: 0;
+    }
+
+    .patient-bot-send {
+      width: auto;
+      margin-top: 0;
+      padding: 12px 14px;
+      flex-shrink: 0;
+    }
+
+    .patient-bot-toggle {
+      width: auto;
+      min-width: 62px;
+      height: 62px;
+      margin-top: 0;
+      border-radius: 999px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 22px 38px rgba(15, 118, 110, .22);
+      font-size: 14px;
+    }
+
+    .patient-bot-toggle span {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .dashboard-export {
+      width: auto;
+      margin-top: 18px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      box-shadow: 0 14px 24px rgba(15, 118, 110, .16);
+    }
+
+    .doctor-calendar-card {
+      margin: 18px;
+    }
+
+    .doctor-calendar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid rgba(19, 34, 32, .08);
+    }
+
+    .doctor-calendar-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+
+    .doctor-calendar-sub {
+      margin-top: 5px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .doctor-calendar-list {
+      padding: 18px 22px 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .doctor-calendar-day {
+      display: grid;
+      gap: 10px;
+    }
+
+    .doctor-calendar-day h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.01em;
+    }
+
+    .doctor-calendar-item {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(15, 118, 110, .05);
+      border: 1px solid rgba(15, 118, 110, .08);
+    }
+
+    .doctor-calendar-time {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0b5f59;
+    }
+
+    .doctor-calendar-patient {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .doctor-calendar-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .doctor-calendar-empty {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(15, 118, 110, .05);
+      border: 1px dashed rgba(15, 118, 110, .14);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    body[data-theme="dark"] .doctor-calendar-item,
+    body[data-theme="dark"] .doctor-calendar-empty {
+      background: rgba(45, 212, 191, .08);
+      border-color: rgba(45, 212, 191, .14);
+    }
+
+    body[data-theme="dark"] .doctor-calendar-time {
+      color: #8ff2e2;
+    }
+
+    body[data-theme="dark"] .patient-bot-panel {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .97), rgba(246, 250, 248, .95));
+      border-color: rgba(19, 34, 32, .08);
+      box-shadow: 0 26px 70px rgba(12, 41, 38, .18);
+    }
+
+    body[data-theme="dark"] .patient-bot-head,
+    body[data-theme="dark"] .patient-bot-messages,
+    body[data-theme="dark"] .patient-bot-suggestions,
+    body[data-theme="dark"] .patient-bot-compose {
+      background: transparent;
+      border-color: rgba(19, 34, 32, .08);
+    }
+
+    body[data-theme="dark"] .patient-bot-head {
+      background: linear-gradient(135deg, rgba(15, 118, 110, .12), rgba(20, 184, 166, .1));
+    }
+
+    body[data-theme="dark"] .patient-bot-head h3 {
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] .patient-bot-head p {
+      color: var(--muted);
+    }
+
+    body[data-theme="dark"] .bot-msg.bot {
+      background: rgba(15, 118, 110, .08);
+      border-color: rgba(15, 118, 110, .08);
+      color: #1b3c37;
+    }
+
+    body[data-theme="dark"] .patient-bot-suggestions button {
+      background: rgba(15, 118, 110, .08);
+      color: #174540;
+      border-color: rgba(15, 118, 110, .08);
+    }
+
+    body[data-theme="dark"] .patient-bot-suggestions button:hover {
+      background: rgba(15, 118, 110, .12);
+    }
+
+    body[data-theme="dark"] .patient-bot-compose input {
+      background: rgba(249, 252, 251, .96);
+      border-color: rgba(19, 34, 32, .1);
+      color: var(--text);
+    }
+
+    .low-stock {
+      color: var(--danger);
+      font-weight: 600
+    }
+
+    .download-btn{
+      width: 100%;
+      padding: 13px 16px;
+      background: linear-gradient(135deg, var(--accent), #550000);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Instrument Sans', sans-serif;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      margin-top: 4px;
+      box-shadow: 0 16px 30px rgba(15, 118, 110, .16)
+    }
+
+    @media(max-width:1280px) {
+      .dashboard-hero {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:1024px) {
+      .sidebar {
+        position: static;
+        width: auto;
+        margin: 16px;
+        top: auto;
+        left: auto;
+        bottom: auto
+      }
+
+      body {
+        display: block
+      }
+
+      .main {
+        margin-left: 0
+      }
+
+      .topbar {
+        margin: 16px
+      }
+
+      .content {
+        padding: 0 16px 24px
+      }
+    }
+
+    @media(max-width:720px) {
+      .topbar {
+        padding: 18px
+      }
+
+      .topbar-title {
+        font-size: 22px
+      }
+
+      .fr2 {
+        grid-template-columns: 1fr
+      }
+
+      .search-input {
+        width: 100%
+      }
+
+      .rec-count {
+        margin-left: 0
+      }
+
+      .hero-banner,
+      .hero-panel,
+      .card,
+      .modal {
+        border-radius: 22px
+      }
+
+      .patient-bot {
+        right: 16px;
+        bottom: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="brand-mark">SH</div>
+        <div>
+          <div class="sb-logo">Smart<span>Hospital</span></div>
+          <div class="sb-caption">Care operations platform</div>
+        </div>
+      </div>
+      <div class="sb-pill" id="role-pill">Admin Panel</div>
+    </div>
+    <div class="sb-label">Overview</div>
+    <button class="nav-item active" onclick="show('dashboard')" id="nav-dashboard"><span
+        class="ic">📊</span>Dashboard</button>
+    <div class="sb-label">People</div>
+    <button class="nav-item" onclick="show('hospitals')" id="nav-hospitals"><span class="ic">🏥</span>Hospitals</button>
+    <button class="nav-item" onclick="show('patients')" id="nav-patients"><span class="ic">🧑‍⚕️</span>Patients</button>
+    <button class="nav-item" onclick="show('doctors')" id="nav-doctors"><span class="ic">👨‍⚕️</span>Doctors</button>
+    <button class="nav-item" onclick="show('nurses')" id="nav-nurses"><span class="ic">💉</span>Nurses</button>
+    <button class="nav-item" onclick="show('staff')" id="nav-staff"><span class="ic">👷</span>Staff</button>
+    <div class="sb-label">Clinical</div>
+    <button class="nav-item" onclick="show('appointments')" id="nav-appointments"><span
+        class="ic">📅</span>Appointments</button>
+    <button class="nav-item" onclick="show('treatments')" id="nav-treatments"><span
+        class="ic">🩺</span>Treatments</button>
+    <button class="nav-item" onclick="show('reports')" id="nav-reports"><span class="ic">🔬</span>Test Reports</button>
+    <button class="nav-item" onclick="show('prescriptions')" id="nav-prescriptions"><span
+        class="ic">💊</span>Prescriptions</button>
+    <button class="nav-item" onclick="show('nurse-treat')" id="nav-nurse-treat"><span
+        class="ic">🔗</span>Nurse–Treat</button>
+    <div class="sb-label">Operations</div>
+    <button class="nav-item" onclick="show('bills')" id="nav-bills"><span class="ic">💳</span>Bills</button>
+    <button class="nav-item" onclick="show('rooms')" id="nav-rooms"><span class="ic">🛏️</span>Rooms</button>
+    <button class="nav-item" onclick="show('admissions')" id="nav-admissions"><span
+        class="ic">🏥</span>Admissions</button>
+    <button class="nav-item" onclick="show('pharmacy')" id="nav-pharmacy"><span class="ic">💊</span>Pharmacy</button>
+    <div class="sb-label">Other</div>
+    <button class="nav-item" onclick="show('insurance')" id="nav-insurance"><span
+        class="ic">🛡️</span>Insurance</button>
+    <button class="nav-item" onclick="show('contacts')" id="nav-contacts"><span class="ic">📞</span>Emergency</button>
+    <button class="nav-item" onclick="show('feedback')" id="nav-feedback"><span class="ic">⭐</span>Feedback</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="tb-title">Dashboard</div>
+        <div class="topbar-sub" id="tb-sub">Overview</div>
+      </div>
+      <div class="topbar-right">
+        <div class="user-chip" id="user-chip">Guest</div>
+        <div class="topbar-date" id="tb-date"></div>
+        <label class="theme-switch" for="theme-toggle">
+          <span class="theme-switch-label" id="theme-toggle-label">Dark Mode</span>
+          <input id="theme-toggle" type="checkbox" onchange="toggleTheme()" />
+          <span class="theme-switch-track"><span class="theme-switch-thumb"></span></span>
+        </label>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <div id="toast"></div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="card doctor-only doctor-calendar-card" id="doctor-calendar-card" style="display:none">
+          <div class="doctor-calendar-head">
+            <div>
+              <div class="doctor-calendar-title">Appointment Calendar</div>
+              <div class="doctor-calendar-sub">Upcoming appointments for this doctor, sorted by date and time.</div>
+            </div>
+            <button class="download-btn dashboard-export" type="button" onclick="exportDoctorCalendarCSV()">Download Calendar CSV</button>
+          </div>
+          <div class="doctor-calendar-list" id="doctor-calendar-list">
+            <div class="doctor-calendar-empty">Loading appointments...</div>
+          </div>
+        </div>
+        <div class="dashboard-hero">
+          <div class="hero-banner">
+            <div class="hero-kicker">Operations Command Center</div>
+            <h2>Manage clinical workflows with a cleaner, executive-ready view.</h2>
+            <p>
+              Monitor appointments, admissions, room availability, billing, and staffing from one unified hospital
+              dashboard designed for day-to-day operations.
+            </p>
+            <div class="hero-actions">
+              <div class="hero-chip">Role-aware access for admin, doctor, and patient views</div>
+              <div class="hero-chip">Fast workflows across hospitals, people, and care records</div>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <h3>Daily focus</h3>
+            <p>Use the navigation to move between clinical, operational, and support modules without breaking flow.</p>
+            <ul class="insight-list">
+              <li><span class="insight-title">Appointments</span><span class="insight-copy">Track pending visits and referrals with a clearer status-first layout.</span></li>
+              <li><span class="insight-title">Capacity</span><span class="insight-copy">Keep an eye on rooms, admissions, and treatment activity in one place.</span></li>
+              <li><span class="insight-title">Revenue</span><span class="insight-copy">Follow billing and pharmacy activity with easier-to-scan tables and actions.</span></li>
+            </ul>
+            <button class="download-btn  dashboard-export admin-only" type="button" onclick="exportDashboardStatsCSV()">Download Stats CSV</button>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🏥</div>
+            <div class="stat-label">Hospitals</div>
+            <div class="stat-value" id="s-hospitals">—</div>
+          </div>
+          <div class="stat-card sky">
+            <div class="stat-icon">🧑‍⚕️</div>
+            <div class="stat-label">Patients</div>
+            <div class="stat-value" id="s-patients">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👨‍⚕️</div>
+            <div class="stat-label">Doctors</div>
+            <div class="stat-value" id="s-doctors">—</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">📅</div>
+            <div class="stat-label">Pending Appts</div>
+            <div class="stat-value" id="s-appointments">—</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">🛏️</div>
+            <div class="stat-label">Rooms Free</div>
+            <div class="stat-value" id="s-rooms">—</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon">💳</div>
+            <div class="stat-label">Pending Bills</div>
+            <div class="stat-value" id="s-pending_bills">—</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">₹</div>
+            <div class="stat-label">Revenue (₹)</div>
+            <div class="stat-value" id="s-revenue" style="font-size:20px">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOSPITALS -->
+      <div class="page" id="page-hospitals">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Hospital</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Hospital ID</label><input type="number" id="h-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>City *</label><input type="text" id="h-city" /></div>
+              </div>
+              <div class="field"><label>Name *</label><input type="text" id="h-name" /></div>
+              <div class="fr2">
+                <div class="field"><label>No. of Doctors *</label><input type="number" id="h-docs" /></div>
+                <div class="field"><label>No. of Staff *</label><input type="number" id="h-staff" /></div>
+              </div>
+              <div class="field"><label>No. of Patients</label><input type="number" id="h-pats" value="0" /></div>
+              <button class="btn-primary" onclick="addHospital()">Add Hospital</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('hospital-tbody',this.value)" /><span class="rec-count" id="hospital-count"></span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Doctors</th>
+                    <th>Staff</th>
+                    <th>Patients</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="hospital-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATIENTS -->
+      <div class="page" id="page-patients">
+        <div class="trigger-note">⚡ <b>Trigger:</b> Leaving Age blank → DB auto-calculates from DOB. Future DOB is
+          blocked.</div>
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add New Patient</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Patient ID</label><input type="number" id="p-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Hospital *</label><select id="p-hid"><option value="">Loading hospitals...</option></select></div>
+              </div>
+              <div class="field"><label>Full Name *</label><input type="text" id="p-name" /></div>
+              <div class="fr2">
+                <div class="field"><label>Date of Birth *</label><input type="date" id="p-dob" /></div>
+                <div class="field"><label>Age (auto if blank)</label><input type="number" id="p-age" /></div>
+              </div>
+              <div class="fr2">
+                <div class="field"><label>Gender *</label><select id="p-gender">
+                    <option value="">Select…</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Others</option>
+                  </select></div>
+                <div class="field"><label>Blood Group *</label><select id="p-blood">
+                    <option value="">Select…</option>
+                    <option>A+</option>
+                    <option>A-</option>
+                    <option>B+</option>
+                    <option>B-</option>
+                    <option>O+</option>
+                    <option>O-</option>
+                    <option>AB+</option>
+                    <option>AB-</option>
+                  </select></div>
+              </div>
+              <div class="field"><label>Phone</label><input type="text" id="p-phone" placeholder="10 digits" /></div>
+              <div class="field"><label>Address</label><input type="text" id="p-address" /></div>
+              <div class="field"><label>Medical History</label><textarea id="p-history"></textarea></div>
+              <button class="btn-primary" onclick="addPatient()">Add Patient</button>
+            </div>
+          </div>
+          <div class="card admin-only" id="patient-login-card">
+            <div class="card-header"><span class="card-title">Create Patient Login (Admin)</span></div>
+            <div class="card-body">
+              <div class="field"><label>Patient ID *</label><input type="number" id="pl-id" placeholder="Existing patient_id" /></div>
+              <div class="field"><label>Username *</label><input type="text" id="pl-username" /></div>
+              <div class="field"><label>Password *</label><input type="password" id="pl-password" /></div>
+              <button class="btn-primary" onclick="addPatientUser()">Create Login</button>
+            </div>
+          </div>
+          <div class="card admin-only" id="patient-login-list">
+            <div class="card-header"><span class="card-title">Existing Patient Logins</span><span class="rec-count" id="pl-count"></span></div>
+            <div class="table-scroll">
+              <table class="login-table">
+                <thead><tr><th>ID</th><th>Username</th><th>Password</th></tr></thead>
+                <tbody id="pl-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('patient-tbody',this.value)" /><span class="rec-count" id="patient-count"></span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Blood</th>
+                    <th>Hosp</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="patient-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCTORS -->
+      <div class="page" id="page-doctors">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Doctor</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Doctor ID</label><input type="number" id="d-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Hospital *</label><select id="d-hid"><option value="">Select hospital...</option></select></div>
+              </div>
+              <div class="field"><label>Full Name *</label><input type="text" id="d-name" /></div>
+              <div class="field"><label>Date of Birth *</label><input type="date" id="d-dob" /></div>
+              <div class="field"><label>Specialization *</label><select id="d-spec">
+                  <option value="">Select…</option>
+                  <option>Cardiology</option>
+                  <option>Cardiac Surgery</option>
+                  <option>Neurology</option>
+                  <option>Neurosurgery</option>
+                  <option>Orthopaedics</option>
+                  <option>Obstetrics</option>
+                  <option>Gynaecology</option>
+                  <option>Gastroenterology</option>
+                  <option>Paediatrics</option>
+                  <option>Pulmonology</option>
+                  <option>Urology</option>
+                  <option>Dermatology</option>
+                  <option>ENT</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>Phone</label><input type="text" id="d-phone" /></div>
+                <div class="field"><label>Experience (yrs)</label><input type="number" id="d-exp" /></div>
+              </div>
+              <div class="field"><label>Email</label><input type="email" id="d-email" /></div>
+              <div class="field"><label>Schedule *</label><input type="text" id="d-schedule"
+                  placeholder="Mon-Fri 9AM-5PM" /></div>
+              <button class="btn-primary" onclick="addDoctor()">Add Doctor</button>
+            </div>
+          </div>
+          <div class="card admin-only" id="doctor-login-card">
+            <div class="card-header"><span class="card-title">Create Doctor Login (Admin)</span></div>
+            <div class="card-body">
+              <div class="field"><label>Doctor ID *</label><input type="number" id="dl-id" placeholder="Existing doctor_id" /></div>
+              <div class="field"><label>Username *</label><input type="text" id="dl-username" /></div>
+              <div class="field"><label>Password *</label><input type="password" id="dl-password" /></div>
+              <button class="btn-primary" onclick="addDoctorUser()">Create Login</button>
+            </div>
+          </div>
+          <div class="card admin-only" id="doctor-login-list">
+            <div class="card-header"><span class="card-title">Existing Doctor Logins</span><span class="rec-count" id="dl-count"></span></div>
+            <div class="table-scroll">
+              <table class="login-table">
+                <thead><tr><th>ID</th><th>Username</th><th>Password</th></tr></thead>
+                <tbody id="dl-body"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('doctor-tbody',this.value)" /><span class="rec-count" id="doctor-count"></span>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Specialization</th>
+                    <th>Phone</th>
+                    <th>Exp.</th>
+                    <th>Schedule</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="doctor-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NURSES -->
+      <div class="page" id="page-nurses">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Nurse</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Nurse ID</label><input type="number" id="n-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Hospital *</label><select id="n-hid"><option value="">Select hospital...</option></select></div>
+              </div>
+              <div class="field"><label>Full Name *</label><input type="text" id="n-name" /></div>
+              <div class="field"><label>Date of Birth *</label><input type="date" id="n-dob" /></div>
+              <div class="field"><label>Department *</label><select id="n-dept">
+                  <option value="">Select…</option>
+                  <option>Medical-Surgical</option>
+                  <option>Intensive Care</option>
+                  <option>Emergency Room</option>
+                  <option>Operating Room</option>
+                  <option>Obstetrics</option>
+                  <option>Oncology</option>
+                  <option>Pediatrics</option>
+                  <option>Geriatrics</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>Shift *</label><select id="n-shift">
+                    <option value="">Select…</option>
+                    <option>morning</option>
+                    <option>Evening</option>
+                    <option>Night</option>
+                  </select></div>
+                <div class="field"><label>Experience (yrs)</label><input type="number" id="n-exp" /></div>
+              </div>
+              <div class="field"><label>Phone</label><input type="text" id="n-phone" /></div>
+              <div class="field"><label>Email</label><input type="email" id="n-email" /></div>
+              <button class="btn-primary" onclick="addNurse()">Add Nurse</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('nurse-tbody',this.value)" /><span class="rec-count" id="nurse-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Shift</th>
+                    <th>Phone</th>
+                    <th>Exp.</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="nurse-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF -->
+      <div class="page" id="page-staff">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Staff</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Staff ID</label><input type="number" id="st-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Hospital *</label><select id="st-hid"><option value="">Select hospital...</option></select></div>
+              </div>
+              <div class="field"><label>Full Name *</label><input type="text" id="st-name" /></div>
+              <div class="field"><label>Occupation *</label><select id="st-occ">
+                  <option value="">Select…</option>
+                  <option>Cleaning</option>
+                  <option>Cooking</option>
+                  <option>Logistics</option>
+                  <option>Accounts</option>
+                  <option>Paramedic</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>DOB *</label><input type="date" id="st-dob" /></div>
+                <div class="field"><label>Age</label><input type="number" id="st-age" /></div>
+              </div>
+              <div class="field"><label>Gender *</label><select id="st-gender">
+                  <option value="">Select…</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Others</option>
+                </select></div>
+              <div class="field"><label>Phone</label><input type="text" id="st-phone" /></div>
+              <div class="field"><label>Address</label><input type="text" id="st-address" /></div>
+              <button class="btn-primary" onclick="addStaff()">Add Staff</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('staff-tbody',this.value)" /><span class="rec-count" id="staff-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Occupation</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENTS -->
+      <div class="page" id="page-appointments">
+        <div class="section-grid">
+          <div class="card" id="appt-form-book" style="display:none;">
+            <div class="card-header"><span class="card-title">Book Appointment</span></div>
+            <div class="card-body">
+              <div class="field"><label>Appointment ID</label><input type="number" id="a-id" readonly placeholder="Auto-generated" /></div>
+              <div class="fr2">
+                <div class="field"><label>Patient ID *</label><input type="number" id="a-pid" /></div>
+                <div class="field"><label>Doctor ID *</label><input type="number" id="a-did" /></div>
+              </div>
+              <div class="field"><label>Date *</label><input type="date" id="a-date" /></div>
+              <div class="field"><label>Time *</label><input type="time" id="a-time" /></div>
+              <div class="field"><label>Status *</label><select id="a-status">
+                  <option value="">Select…</option>
+                  <option>Pending</option>
+                  <option>Completed</option>
+                  <option>Postponed</option>
+                  <option>Due</option>
+                </select></div>
+              <button class="btn-primary" onclick="addAppointment()">Book Appointment</button>
+            </div>
+          </div>
+          <div class="card" id="appt-form-refer" style="display:none;">
+            <div class="card-header"><span class="card-title">Refer Patient to Another Doctor</span></div>
+            <div class="card-body">
+              <div class="field"><label>Select Patient from Your List *</label>
+                <select id="ref-pid">
+                  <option value="">Loading your patients...</option>
+                </select>
+              </div>
+              <div class="field"><label>Refer To Doctor (NOT yourself) *</label>
+                <select id="ref-did">
+                  <option value="">Loading doctors...</option>
+                </select>
+              </div>
+              <div class="field"><label>Appointment Date *</label><input type="date" id="ref-date" /></div>
+              <div class="field"><label>Appointment Time *</label><input type="time" id="ref-time" /></div>
+              <div class="field"><label>Status *</label><select id="ref-status">
+                  <option value="">Select…</option>
+                  <option>Pending</option>
+                  <option>Completed</option>
+                  <option>Postponed</option>
+                  <option>Due</option>
+                </select></div>
+              <button class="btn-primary" onclick="referPatient()">Create Referral</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><input class="search-input" type="text" placeholder="Search…"
+                oninput="searchTable('appt-tbody',this.value)" /><span class="rec-count" id="appt-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="appt-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TREATMENTS -->
+      <div class="page" id="page-treatments">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Treatment</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Treatment ID</label><input type="number" id="tr-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Appointment ID *</label><input type="number" id="tr-aptid" placeholder="Ex: 5" /></div>
+              </div>
+              <div class="field"><label>Treatment Date *</label><input type="date" id="tr-date" /></div>
+              <div class="field"><label>Diagnosis *</label><input type="text" id="tr-diag" /></div>
+              <div class="field"><label>Description</label><input type="text" id="tr-desc" /></div>
+              <div class="field"><label>Prescription</label><input type="text" id="tr-presc" /></div>
+              <button class="btn-primary" onclick="addTreatment()">Add Treatment</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="treat-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Diagnosis</th>
+                    <th>Prescription</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="treat-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILLS -->
+      <div class="page" id="page-bills">
+        <div class="trigger-note">⚡ <b>Trigger:</b> Changing Pending → Paid auto-sets bill_date = today in the database.
+        </div>
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Create Bill</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Bill ID</label><input type="number" id="b-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Patient *</label><select id="b-pid"><option value="">Select patient...</option></select></div>
+              </div>
+              <div class="field"><label>Treatment (opt.)</label><select id="b-tid"><option value="">Select treatment...</option></select></div>
+              <div class="field"><label>Amount (₹) *</label><input type="number" id="b-amount" /></div>
+              <div class="field"><label>Status *</label><select id="b-status">
+                  <option value="">Select…</option>
+                  <option>Pending</option>
+                  <option>Paid</option>
+                </select></div>
+              <div class="field"><label>Payment Mode *</label><select id="b-mode">
+                  <option value="">Select…</option>
+                  <option>Cash</option>
+                  <option>Card</option>
+                  <option>UPI</option>
+                  <option>Cheque</option>
+                  <option>Net Banking</option>
+                  <option>Bank Transfer</option>
+                </select></div>
+              <div class="field"><label>Bill Date *</label><input type="date" id="b-date" /></div>
+              <button class="btn-primary" onclick="addBill()">Create Bill</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="bill-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bill ID</th>
+                    <th>Patient</th>
+                    <th>Amount (₹)</th>
+                    <th>Status</th>
+                    <th>Mode</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bill-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROOMS -->
+      <div class="page" id="page-rooms">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Room</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Room ID</label><input type="number" id="rm-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Room Number *</label><input type="text" id="rm-num" /></div>
+              </div>
+              <div class="field"><label>Room Type *</label><select id="rm-type">
+                  <option value="">Select…</option>
+                  <option>General</option>
+                  <option>Semi-Private</option>
+                  <option>Private</option>
+                  <option>ICU</option>
+                  <option>NICU</option>
+                  <option>Operation Theatre</option>
+                  <option>Emergency</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>Floor</label><input type="number" id="rm-floor" value="0" /></div>
+                <div class="field"><label>Daily Charge (₹)</label><input type="number" id="rm-charge" value="0" /></div>
+              </div>
+              <div class="field"><label>Status *</label><select id="rm-status">
+                  <option value="">Select…</option>
+                  <option>Available</option>
+                  <option>Occupied</option>
+                  <option>Under Maintenance</option>
+                </select></div>
+              <div class="field"><label>Hospital ID *</label><input type="number" id="rm-hid" /></div>
+              <button class="btn-primary" onclick="addRoom()">Add Room</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="room-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Room No</th>
+                    <th>Type</th>
+                    <th>Floor</th>
+                    <th>Charge (₹)</th>
+                    <th>Status</th>
+                    <th>Change</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="room-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMISSIONS -->
+      <div class="page" id="page-admissions">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Record Admission</span></div>
+            <div class="card-body">
+              <div class="field"><label>Admission ID</label><input type="number" id="ad-id" readonly placeholder="Auto-generated" /></div>
+              <div class="fr2">
+                <div class="field"><label>Patient *</label><select id="ad-pid"><option value="">Select patient...</option></select></div>
+                <div class="field"><label>Doctor *</label><select id="ad-did"><option value="">Select doctor...</option></select></div>
+              </div>
+              <div class="field"><label>Room *</label><select id="ad-rid"><option value="">Select room...</option></select></div>
+              <div class="fr2">
+                <div class="field"><label>Admission Date *</label><input type="date" id="ad-adate" /></div>
+                <div class="field"><label>Discharge Date (opt.)</label><input type="date" id="ad-ddate" /></div>
+              </div>
+              <div class="field"><label>Reason *</label><textarea id="ad-reason"></textarea></div>
+              <button class="btn-primary" onclick="addAdmission()">Record Admission</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="admit-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Room</th>
+                    <th>Admitted</th>
+                    <th>Discharged</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admit-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHARMACY -->
+      <div class="page" id="page-pharmacy">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Medicine</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Medication ID</label><input type="number" id="ph-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Unit *</label><select id="ph-unit">
+                    <option value="">Select…</option>
+                    <option>mg</option>
+                    <option>ml</option>
+                    <option>tablet</option>
+                    <option>capsule</option>
+                    <option>injection</option>
+                    <option>syrup</option>
+                    <option>drop</option>
+                    <option>cream</option>
+                    <option>ointment</option>
+                  </select></div>
+              </div>
+              <div class="field"><label>Medicine Name *</label><select id="ph-name">
+                  <option value="">Select...</option>
+                  <option>Paracetamol 500mg</option>
+                  <option>Ibuprofen 400mg</option>
+                  <option>Amoxicillin 500mg</option>
+                  <option>Azithromycin 500mg</option>
+                  <option>Cetirizine 10mg</option>
+                  <option>Pantoprazole 40mg</option>
+                  <option>Metformin 500mg</option>
+                  <option>Amlodipine 5mg</option>
+                  <option>ORS</option>
+                  <option>Vitamin C</option>
+                  <option>Insulin</option>
+                  <option>Other</option>
+                </select></div>
+              <div class="field"><label>Category *</label><select id="ph-cat">
+                  <option value="">Select…</option>
+                  <option>Antibiotic</option>
+                  <option>Painkiller</option>
+                  <option>Antiviral</option>
+                  <option>Antifungal</option>
+                  <option>Supplement</option>
+                  <option>Vaccine</option>
+                  <option>Steroid</option>
+                  <option>Antacid</option>
+                  <option>Antidiabetic</option>
+                  <option>Antihypertensive</option>
+                  <option>Other</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>Stock *</label><input type="number" id="ph-stock" /></div>
+                <div class="field"><label>Price/Unit (₹) *</label><input type="number" id="ph-price" /></div>
+              </div>
+              <div class="field"><label>Expiry Date</label><input type="date" id="ph-expiry" /></div>
+              <button class="btn-primary" onclick="addPharmacy()">Add Medicine</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span style="font-size:11px;color:var(--danger)">⚠ Red = low stock
+                (&lt;50)</span><span class="rec-count" id="pharma-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Unit</th>
+                    <th>Stock</th>
+                    <th>Price (₹)</th>
+                    <th>Expiry</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pharma-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEST REPORTS -->
+      <div class="page" id="page-reports">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Test Report</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Report ID</label><input type="number" id="rp-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Treatment ID *</label><input type="number" id="rp-tid" placeholder="Next treatment id" disabled /></div>
+              </div>
+              <div class="field"><label>Test Name *</label><select id="rp-test">
+                  <option value="">Select…</option>
+                  <option>CBC</option>
+                  <option>Lipid Profile</option>
+                  <option>LFT</option>
+                  <option>KFT</option>
+                  <option>Thyroid</option>
+                  <option>HbA1c</option>
+                  <option>Glucose</option>
+                  <option>Blood Group</option>
+                  <option>Vitamin D</option>
+                  <option>B12</option>
+                  <option>X-ray</option>
+                  <option>CT Scan</option>
+                  <option>MRI</option>
+                  <option>Ultrasound</option>
+                </select></div>
+              <div class="field"><label>Report Date *</label><input type="date" id="rp-date" /></div>
+              <div class="field"><label>Result</label><input type="text" id="rp-result" /></div>
+              <button class="btn-primary" onclick="addReport()">Add Report</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="report-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Test</th>
+                    <th>Result</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="report-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESCRIPTIONS -->
+      <div class="page" id="page-prescriptions">
+        <div class="section-grid">
+          <div class="card" id="add-presc-card">
+            <div class="card-header"><span class="card-title">Add Prescription</span></div>
+            <div class="card-body">
+              <div class="field"><label>Prescription ID</label><input type="number" id="pr-id" readonly placeholder="Auto-generated" /></div>
+              <div class="fr2">
+                <div class="field"><label>Treatment *</label><select id="pr-tid"><option value="">Loading treatments...</option></select></div>
+                <div class="field"><label>Medicine *</label><select id="pr-mid" onchange="updatePrescriptionStockHint()"><option value="">Loading medicines...</option></select></div>
+              </div>
+              <div class="field"><label>Dosage *</label><input type="text" id="pr-dos"
+                  placeholder="e.g. 5mg once daily" /></div>
+              <div class="field"><label>Frequency *</label><select id="pr-freq">
+                  <option value="">Select…</option>
+                  <option>Once a day</option>
+                  <option>Twice a day</option>
+                  <option>Thrice a day</option>
+                  <option>Four times a day</option>
+                  <option>As needed</option>
+                  <option>Weekly</option>
+                  <option>Monthly</option>
+                </select></div>
+              <div class="fr2">
+                <div class="field"><label>Duration (days) *</label><input type="number" id="pr-dur" /></div>
+                <div class="field"><label>Quantity to Dispense *</label><input type="number" id="pr-qty" min="1" /></div>
+              </div>
+              <div class="hint" id="pr-stock-hint">Select a medicine to see current stock.</div>
+              <button class="btn-secondary" style="margin-bottom: 10px; width: auto; padding: 8px 16px;" onclick="addMedicineToBulkList()">Add Medicine to List</button>
+              
+              <div class="table-scroll" style="margin-bottom: 15px; border: 1px solid var(--border); border-radius: 4px;">
+                <table style="margin: 0; box-shadow: none;">
+                  <thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Days</th><th>Qty</th><th></th></tr></thead>
+                  <tbody id="bulk-med-tbody"><tr><td colspan="6" style="text-align:center; padding:10px;">Select a treatment and add medicines above</td></tr></tbody>
+                </table>
+              </div>
+
+              <button class="btn-primary" onclick="submitBulkPrescription()">Submit Prescription List</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="presc-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Diagnosis</th>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Days</th>
+                    <th>Qty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="presc-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSURANCE -->
+      <div class="page" id="page-insurance">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Insurance</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field"><label>Insurance ID</label><input type="number" id="ins-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field"><label>Patient *</label><select id="ins-pid"><option value="">Select patient...</option></select></div>
+              </div>
+              <div class="field"><label>Provider Name *</label><input type="text" id="ins-prov" /></div>
+              <div class="field"><label>Policy Number *</label><input type="text" id="ins-pol" /></div>
+              <div class="field"><label>Coverage Amount (₹) *</label><input type="number" id="ins-cov" /></div>
+              <div class="field"><label>Expiry Date *</label><input type="date" id="ins-exp" /></div>
+              <button class="btn-primary" onclick="addInsurance()">Add Insurance</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="ins-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Provider</th>
+                    <th>Policy No.</th>
+                    <th>Coverage (₹)</th>
+                    <th>Expiry</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ins-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMERGENCY CONTACTS -->
+      <div class="page" id="page-contacts">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Add Emergency Contact</span></div>
+            <div class="card-body">
+              <div class="fr2">
+                <div class="field" id="ec-id-field"><label>Contact ID</label><input type="number" id="ec-id" readonly placeholder="Auto-generated" /></div>
+                <div class="field" id="ec-pid-field"><label>Patient *</label><select id="ec-pid"><option value="">Select patient...</option></select></div>
+              </div>
+              <div class="field"><label>Contact Name *</label><input type="text" id="ec-name" /></div>
+              <div class="field"><label>Relationship *</label><select id="ec-rel">
+                  <option value="">Select…</option>
+                  <option>Spouse</option>
+                  <option>Parent</option>
+                  <option>Child</option>
+                  <option>Sibling</option>
+                  <option>Friend</option>
+                  <option>Guardian</option>
+                  <option>Other</option>
+                </select></div>
+              <div class="field"><label>Phone (10 digits) *</label><input type="text" id="ec-phone" /></div>
+              <button class="btn-primary" onclick="addContact()">Add Contact</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="ec-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Name</th>
+                    <th>Relationship</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ec-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK -->
+      <div class="page" id="page-feedback">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Submit Feedback</span></div>
+            <div class="card-body">
+              <div class="field" id="fb-id-field"><label>Feedback ID</label><input type="number" id="fb-id" readonly placeholder="Auto-generated" /></div>
+              <div class="fr2">
+                <div class="field" id="fb-pid-field"><label>Patient *</label><select id="fb-pid"><option value="">Select patient...</option></select></div>
+                <div class="field" id="fb-did-field"><label>Doctor (opt.)</label><select id="fb-did"><option value="">Select doctor...</option></select></div>
+                <div class="field" id="fb-doctor-select-field" style="display:none">
+                  <label>Doctor (opt.)</label>
+                  <select id="fb-did-select">
+                    <option value="">Select a doctor...</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field" id="fb-hid-field"><label>Hospital (opt.)</label><select id="fb-hid"><option value="">Select hospital...</option></select></div>
+              <div class="field" id="fb-hospital-select-field" style="display:none">
+                <label>Hospital (opt.)</label>
+                <select id="fb-hid-select">
+                  <option value="">Select a hospital...</option>
+                </select>
+              </div>
+              <div class="fr2">
+                <div class="field"><label>Rating (0–10) *</label><input type="number" id="fb-rating" min="0" max="10" />
+                </div>
+                <div class="field"><label>Date *</label><input type="date" id="fb-date" /></div>
+              </div>
+              <div class="field"><label>Comments</label><textarea id="fb-comments"></textarea></div>
+              <button class="btn-primary" onclick="addFeedback()">Submit Feedback</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="fb-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Rating</th>
+                    <th>Comments</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="fb-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NURSE-TREATMENT -->
+      <div class="page" id="page-nurse-treat">
+        <div class="section-grid">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Assign Nurse to Treatment</span></div>
+            <div class="card-body">
+              <div class="field"><label>Nurse *</label><select id="nt-nid"><option value="">Select nurse...</option></select></div>
+              <div class="field"><label>Treatment *</label><select id="nt-tid"><option value="">Select treatment...</option></select></div>
+              <button class="btn-primary" onclick="addNurseTreat()">Assign</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="table-toolbar"><span class="rec-count" id="nt-count"></span></div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nurse ID</th>
+                    <th>Nurse Name</th>
+                    <th>Treatment ID</th>
+                    <th>Diagnosis</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="nt-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- EDIT MODAL (shared, filled dynamically) -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h3 id="modal-title">Edit Record</h3>
+      <div id="modal-body"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" style="width:auto;padding:8px 20px" onclick="saveModal()">Save Changes</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="patient-bot" id="patient-bot">
+    <div class="patient-bot-panel" id="patient-bot-panel">
+      <div class="patient-bot-head">
+        <h3>Patient Help Bot</h3>
+        <p>Ask simple questions like booking appointments, seeing doctors, bills, prescriptions, or contacts.</p>
+      </div>
+      <div class="patient-bot-messages" id="patient-bot-messages"></div>
+      <div class="patient-bot-suggestions">
+        <button type="button" onclick="usePatientBotPrompt('How do I book an appointment?')">Book appointment</button>
+        <button type="button" onclick="usePatientBotPrompt('How do I find doctors?')">Find doctors</button>
+        <button type="button" onclick="usePatientBotPrompt('How can I see my bills?')">View bills</button>
+        <button type="button" onclick="usePatientBotPrompt('How do I add an emergency contact?')">Emergency contact</button>
+      </div>
+      <div class="patient-bot-compose">
+        <input id="patient-bot-input" type="text" placeholder="Ask for simple help..." onkeydown="handlePatientBotKey(event)" />
+        <button class="patient-bot-send" type="button" onclick="sendPatientBotMessage()">Send</button>
+      </div>
+    </div>
+    <button class="patient-bot-toggle" id="patient-bot-toggle" type="button" onclick="togglePatientBot()"><span>💬</span>Help</button>
+  </div>
+
+  <script>
+    // API base aligned with the backend default port in server.js
+    var API = 'http://localhost:3000';
+    var modalSaveFn = null; // holds the save function for the current modal
+    var currentPage = 'dashboard';
+    var hospitalOptions = [];
+    var doctorCalendarRows = [];
+    var theme = localStorage.getItem('shTheme') || 'light';
+    var patientBotStarted = false;
+    var session = null;
+    try { session = JSON.parse(localStorage.getItem('shSession') || 'null'); } catch (e) { session = null; }
+    if (!session || !session.role || !session.id) window.location.href = 'login.html';
+
+    function applyTheme(nextTheme) {
+      theme = nextTheme === 'dark' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('shTheme', theme);
+      var toggle = document.getElementById('theme-toggle');
+      if (toggle) toggle.checked = theme === 'dark';
+      var label = document.getElementById('theme-toggle-label');
+      if (label) label.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    }
+
+    function toggleTheme() {
+      applyTheme(theme === 'dark' ? 'light' : 'dark');
+    }
+
+    function exportDashboardStatsCSV() {
+      if (session.role !== 'admin') return;
+      var stats = [
+        ['Metric', 'Value'],
+        ['Hospitals', document.getElementById('s-hospitals').textContent.trim()],
+        ['Patients', document.getElementById('s-patients').textContent.trim()],
+        ['Doctors', document.getElementById('s-doctors').textContent.trim()],
+        ['Pending Appointments', document.getElementById('s-appointments').textContent.trim()],
+        ['Rooms Free', document.getElementById('s-rooms').textContent.trim()],
+        ['Pending Bills', document.getElementById('s-pending_bills').textContent.trim()],
+        ['Revenue (INR)', document.getElementById('s-revenue').textContent.trim()]
+      ];
+      var csv = stats.map(function (row) {
+        return row.map(function (value) {
+          return '"' + String(value).replace(/"/g, '""') + '"';
+        }).join(',');
+      }).join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'dashboard-stats.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      toast('Dashboard stats CSV downloaded');
+    }
+    function loadDoctorCalendar() {
+      if (session.role !== 'doctor') return;
+      get('/appointments', function (rows) {
+        var list = document.getElementById('doctor-calendar-list');
+        if (!list) return;
+        if (!rows || rows.error) {
+          list.innerHTML = '<div class="doctor-calendar-empty">Unable to load appointments.</div>';
+          doctorCalendarRows = [];
+          return;
+        }
+        doctorCalendarRows = rows.slice().sort(function (a, b) {
+          var left = (a.appointment_date || '') + ' ' + (a.appointment_time || '00:00');
+          var right = (b.appointment_date || '') + ' ' + (b.appointment_time || '00:00');
+          return left.localeCompare(right);
+        });
+        if (!doctorCalendarRows.length) {
+          list.innerHTML = '<div class="doctor-calendar-empty">No appointments scheduled right now.</div>';
+          return;
+        }
+        var html = '';
+        var currentDate = '';
+        doctorCalendarRows.forEach(function (appt) {
+          var dayLabel = fmtDate(appt.appointment_date);
+          if (dayLabel !== currentDate) {
+            if (currentDate) html += '</div>';
+            currentDate = dayLabel;
+            html += '<div class="doctor-calendar-day"><h4>' + dayLabel + '</h4>';
+          }
+          html += '<div class="doctor-calendar-item">' +
+            '<div class="doctor-calendar-time">' + (appt.appointment_time || '-') + '</div>' +
+            '<div style="flex:1"><div class="doctor-calendar-patient">' + (appt.patient_name || 'Patient') + '</div>' +
+            '<div class="doctor-calendar-meta">Status: ' + (appt.status || '-') + (appt.illness_description ? ' | ' + appt.illness_description : '') + '</div></div>' +
+            '<div class="doctor-calendar-action">' + ab('Status', 'ab-status', 'quickStatusAppt(' + appt.appointment_id + ',\'' + appt.status + '\')') + '</div>' +
+            '</div>';
+        });
+        if (currentDate) html += '</div>';
+        list.innerHTML = html;
+      });
+    }
+    function exportDoctorCalendarCSV() {
+      if (session.role !== 'doctor') return;
+      if (!doctorCalendarRows.length) {
+        toast('No appointments available to export', true);
+        return;
+      }
+      var rows = [['Date', 'Time', 'Patient', 'Status', 'Notes']];
+      doctorCalendarRows.forEach(function (appt) {
+        rows.push([
+          fmtDate(appt.appointment_date),
+          appt.appointment_time || '',
+          appt.patient_name || '',
+          appt.status || '',
+          appt.illness_description || ''
+        ]);
+      });
+      var csv = rows.map(function (row) {
+        return row.map(function (value) {
+          return '"' + String(value).replace(/"/g, '""') + '"';
+        }).join(',');
+      }).join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'doctor-appointment-calendar.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      toast('Doctor calendar CSV downloaded');
+    }
+
+    function appendPatientBotMessage(kind, text) {
+      var wrap = document.getElementById('patient-bot-messages');
+      if (!wrap) return;
+      var item = document.createElement('div');
+      item.className = 'bot-msg ' + kind;
+      item.textContent = text;
+      wrap.appendChild(item);
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function getPatientBotReply(message) {
+      var text = String(message || '').toLowerCase();
+      if (text.indexOf('appointment') >= 0 || text.indexOf('book') >= 0) {
+        return 'To book an appointment:\n1. Open the Doctors page.\n2. Click the Book button beside a doctor.\n3. Choose date and time.\n4. Submit, then check the Appointments page.';
+      }
+      if (text.indexOf('doctor') >= 0 || text.indexOf('find') >= 0) {
+        return 'Open the Doctors page from the left menu. You can browse doctors there and use the Book action to request an appointment.';
+      }
+      if (text.indexOf('bill') >= 0 || text.indexOf('payment') >= 0) {
+        return 'Open Bills from the left menu to see your billing records and payment status.';
+      }
+      if (text.indexOf('prescription') >= 0 || text.indexOf('medicine') >= 0 || text.indexOf('pharmacy') >= 0) {
+        return 'Check Prescriptions to see medicines advised by the doctor. Open Pharmacy to view medicine details available in the system.';
+      }
+      if (text.indexOf('report') >= 0 || text.indexOf('test') >= 0) {
+        return 'Open Test Reports from the left menu to view your diagnostic or lab reports.';
+      }
+      if (text.indexOf('emergency') >= 0 || text.indexOf('contact') >= 0) {
+        return 'Go to Emergency in the side menu. Patients can add, edit, or delete their emergency contacts there.';
+      }
+      if (text.indexOf('feedback') >= 0) {
+        return 'Use the Feedback page to submit and manage your feedback.';
+      }
+      if (text.indexOf('room') >= 0 || text.indexOf('admission') >= 0) {
+        return 'Open Rooms to view room status and Admissions to see admission records connected to your account.';
+      }
+      if (text.indexOf('insurance') >= 0) {
+        return 'Your insurance information is available on the Insurance page from the left menu.';
+      }
+      if (text.indexOf('hello') >= 0 || text.indexOf('hi') >= 0 || text.indexOf('help') >= 0) {
+        return 'I can help with simple patient questions like appointments, doctors, bills, reports, prescriptions, insurance, rooms, admissions, feedback, and emergency contacts.';
+      }
+      return 'I can help with simple patient navigation. Try asking about appointments, doctors, bills, prescriptions, reports, insurance, rooms, admissions, feedback, or emergency contacts.';
+    }
+
+    function initPatientBot() {
+      if (session.role !== 'patient' || patientBotStarted) return;
+      patientBotStarted = true;
+      appendPatientBotMessage('bot', 'Hi, I am your patient help bot. Ask simple questions like "how to book an appointment" or use one of the quick buttons below.');
+    }
+
+    function togglePatientBot() {
+      if (session.role !== 'patient') return;
+      var bot = document.getElementById('patient-bot');
+      if (!bot) return;
+      bot.classList.toggle('open');
+      if (bot.classList.contains('open')) {
+        initPatientBot();
+        var input = document.getElementById('patient-bot-input');
+        if (input) input.focus();
+      }
+    }
+
+    function sendPatientBotMessage() {
+      if (session.role !== 'patient') return;
+      var input = document.getElementById('patient-bot-input');
+      if (!input) return;
+      var text = input.value.trim();
+      if (!text) return;
+      initPatientBot();
+      appendPatientBotMessage('user', text);
+      appendPatientBotMessage('bot', getPatientBotReply(text));
+      input.value = '';
+      input.focus();
+    }
+
+    function usePatientBotPrompt(text) {
+      var input = document.getElementById('patient-bot-input');
+      if (!input) return;
+      input.value = text;
+      sendPatientBotMessage();
+    }
+
+    function handlePatientBotKey(event) {
+      if (event.key === 'Enter') sendPatientBotMessage();
+    }
+
+    var ROLE_CONFIG = {
+      admin: {
+        pages: ['dashboard', 'hospitals', 'patients', 'doctors', 'nurses', 'staff', 'appointments', 'treatments', 'reports', 'prescriptions', 'nurse-treat', 'bills', 'rooms', 'admissions', 'pharmacy', 'insurance', 'contacts', 'feedback'],
+        writable: ['dashboard', 'hospitals', 'patients', 'doctors', 'nurses', 'staff', 'appointments', 'treatments', 'reports', 'prescriptions', 'nurse-treat', 'bills', 'rooms', 'admissions', 'pharmacy', 'insurance', 'contacts', 'feedback']
+      },
+      doctor: {
+        pages: ['dashboard', 'patients', 'appointments', 'treatments', 'reports', 'prescriptions', 'admissions', 'contacts'],
+        writable: ['treatments', 'reports', 'prescriptions']
+      },
+      patient: {
+        pages: ['dashboard', 'hospitals', 'doctors', 'appointments', 'treatments', 'reports', 'prescriptions', 'nurse-treat', 'bills', 'rooms', 'admissions', 'pharmacy', 'insurance', 'contacts', 'feedback'],
+        writable: ['appointments', 'contacts', 'feedback']
+      },
+      staff: {
+        pages: ['hospitals', 'nurses', 'staff', 'nurse-treat', 'admissions', 'contacts'],
+        writable: ['staff']
+      }
+    };
+    var cfg = ROLE_CONFIG[session.role] || ROLE_CONFIG.patient;
+
+    var ACTION_MAP = {
+      addHospital: 'hospitals', editHospital: 'hospitals', delHospital: 'hospitals',
+      addPatient: 'patients', editPatient: 'patients', delPatient: 'patients',
+      addDoctor: 'doctors', editDoctor: 'doctors', delDoctor: 'doctors',
+      addNurse: 'nurses', editNurse: 'nurses', delNurse: 'nurses',
+      addStaff: 'staff', editStaff: 'staff', delStaff: 'staff',
+      addAppointment: 'appointments', editAppt: 'appointments', delAppt: 'appointments', referPatient: 'appointments', bookWithDoctor: 'doctors',
+      addTreatment: 'treatments', editTreatment: 'treatments', delTreatment: 'treatments',
+      addBill: 'bills', editBill: 'bills', delBill: 'bills',
+      addRoom: 'rooms', editRoom: 'rooms', delRoom: 'rooms', bookRoom: 'rooms',
+      addAdmission: 'admissions', editAdmission: 'admissions', delAdmission: 'admissions',
+      addPharmacy: 'pharmacy', editPharmacy: 'pharmacy', delPharmacy: 'pharmacy',
+      addReport: 'reports', editReport: 'reports', delReport: 'reports',
+      addPrescription: 'prescriptions', editPresc: 'prescriptions', delPresc: 'prescriptions',
+      addInsurance: 'insurance', editInsurance: 'insurance', delInsurance: 'insurance',
+      addContact: 'contacts', editContact: 'contacts', delContact: 'contacts',
+      addFeedback: 'feedback', editFeedback: 'feedback', delFeedback: 'feedback',
+      addNurseTreat: 'nurse-treat', delNurseTreat: 'nurse-treat',
+      addPatientUser: 'patients', addDoctorUser: 'doctors'
+    };
+    var ACTION_ALLOW = {
+      admin: '*',
+      doctor: ['editTreatment', 'addTreatment', 'addReport', 'editReport', 'addPrescription', 'editPresc', 'referPatient', 'quickStatusAppt', 'editAppt'],
+      patient: ['bookWithDoctor', 'addContact', 'editContact', 'delContact', 'addFeedback', 'editFeedback', 'delFeedback'],
+      staff: ['editStaff']
+    };
+
+    // ── page titles ──
+    var META = {
+      dashboard: 'Dashboard', hospitals: 'Hospitals', patients: 'Patients', doctors: 'Doctors',
+      nurses: 'Nurses', staff: 'Staff', appointments: 'Appointments', treatments: 'Treatments',
+      bills: 'Bills & Payments', rooms: 'Rooms', admissions: 'Admissions', pharmacy: 'Pharmacy',
+      reports: 'Test Reports', prescriptions: 'Prescriptions', insurance: 'Insurance',
+      contacts: 'Emergency Contacts', feedback: 'Feedback', 'nurse-treat': 'Nurse–Treatment'
+    };
+    var SUBS = {
+      dashboard: 'Hospital system overview', hospitals: 'Manage hospital branches',
+      patients: 'Patient records', doctors: 'Doctor profiles', nurses: 'Nursing staff',
+      staff: 'Non-clinical staff', appointments: 'Schedule and track', treatments: 'Treatment records',
+      bills: 'Billing and payments', rooms: 'Room status and management', admissions: 'Patient admissions',
+      pharmacy: 'Medicine inventory', reports: 'Lab and diagnostic reports',
+      prescriptions: 'Prescription details', insurance: 'Patient insurance', contacts: 'Emergency contacts',
+      feedback: 'Patient feedback', 'nurse-treat': 'Nurse assignments'
+    };
+
+    // Set date in topbar and session header
+    applyTheme(theme);
+    var _d = new Date();
+    document.getElementById('tb-date').textContent = _d.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    document.getElementById('user-chip').textContent = session.username + ' (' + session.role + ')';
+    document.getElementById('role-pill').textContent = session.role.toUpperCase() + ' PANEL';
+    initPatientFriendlyForms();
+    initAdminFriendlyForms();
+
+    function logout() {
+      localStorage.removeItem('shSession');
+      window.location.href = 'login.html';
+    }
+
+    function canSeePage(name) { return cfg.pages.indexOf(name) >= 0; }
+    function canWritePage(name) { return cfg.writable.indexOf(name) >= 0; }
+    function canRunAction(fnName) {
+      if (ACTION_ALLOW[session.role] === '*') return true;
+      return (ACTION_ALLOW[session.role] || []).indexOf(fnName) >= 0;
+    }
+    function authHeaders() {
+      return { 'Content-Type': 'application/json', 'x-user-role': session.role, 'x-user-id': String(session.id) };
+    }
+    function byRole(rows, page) {
+      if (session.role === 'admin') return rows;
+      if (session.role === 'doctor') {
+        // Backend already filters patients by doctor via appointments
+        // No additional filtering needed here
+        return rows;
+      }
+      if (session.role === 'patient') {
+        if (page === 'rooms') return rows.filter(function (r) { return r.status === 'Available' || r.status === 'Occupied'; });
+      }
+      return rows;
+    }
+
+    function applyRoleUI() {
+      Object.keys(META).forEach(function (p) {
+        if (p === 'dashboard') return;
+        var nav = document.getElementById('nav-' + p);
+        var page = document.getElementById('page-' + p);
+        if (!canSeePage(p)) {
+          if (nav) nav.style.display = 'none';
+          if (page) page.remove();
+        }
+      });
+      document.querySelectorAll('button.btn-primary[onclick]').forEach(function (btn) {
+        var fn = (btn.getAttribute('onclick') || '').split('(')[0];
+        var p = ACTION_MAP[fn];
+        if (p && !canWritePage(p)) {
+          var card = btn.closest('.card');
+          if (card) card.style.display = 'none';
+        }
+      });
+      
+      // Special handling for appointment forms based on role
+      var formBook = document.getElementById('appt-form-book');
+      var formRefer = document.getElementById('appt-form-refer');
+      if (formBook) { formBook.style.display = 'none'; } // booking now happens from Doctors page for patients
+      if (formRefer) {
+        formRefer.style.display = (session.role === 'doctor') ? '' : 'none';
+      }
+      // Show admin-only helpers
+      document.querySelectorAll('.admin-only').forEach(function (el) {
+        el.style.display = (session.role === 'admin') ? 'block' : 'none';
+      });
+      document.querySelectorAll('.doctor-only').forEach(function (el) {
+        el.style.display = (session.role === 'doctor') ? '' : 'none';
+      });
+      var patientBot = document.getElementById('patient-bot');
+      if (patientBot) patientBot.style.display = (session.role === 'patient') ? 'flex' : 'none';
+    }
+
+    // ── Navigation ──
+    function show(name) {
+      if (!canSeePage(name)) return;
+      currentPage = name;
+      if (session.role === 'admin') initAdminFriendlyForms();
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active') });
+      document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active') });
+      document.getElementById('page-' + name).classList.add('active');
+      var nb = document.getElementById('nav-' + name);
+      if (nb) nb.classList.add('active');
+      document.getElementById('tb-title').textContent = META[name] || name;
+      document.getElementById('tb-sub').textContent = SUBS[name] || '';
+      var loaders = {
+        dashboard: loadStats, hospitals: loadHospitals, patients: loadPatients, doctors: loadDoctors,
+        nurses: loadNurses, staff: loadStaff, appointments: loadAppointments, treatments: loadTreatments,
+        bills: loadBills, rooms: loadRooms, admissions: loadAdmissions, pharmacy: loadPharmacy,
+        reports: loadReports, prescriptions: loadPrescriptions, insurance: loadInsurance,
+        contacts: loadContacts, feedback: loadFeedback, 'nurse-treat': loadNurseTreat
+      };
+      refreshAutoIds();
+      if (loaders[name]) loaders[name]();
+    }
+
+    // ── Toast ──
+    function toast(msg, isErr) {
+      var t = document.getElementById('toast');
+      t.textContent = msg; t.className = isErr ? 'error' : 'success';
+      t.style.display = 'block';
+      setTimeout(function () { t.style.display = 'none' }, 3000);
+    }
+
+    // ── Fetch helpers ──
+    function get(url, cb) { fetch(API + url, { headers: authHeaders() }).then(function (r) { return r.json() }).then(cb).catch(function (e) { toast('Error: ' + e.message, true) }) }
+    function post(url, data, cb) { fetch(API + url, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) }).then(function (r) { return r.json() }).then(cb).catch(function (e) { toast('Error: ' + e.message, true) }) }
+    function put(url, data, cb) { fetch(API + url, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) }).then(function (r) { return r.json() }).then(cb).catch(function (e) { toast('Error: ' + e.message, true) }) }
+    function del(url, cb) { fetch(API + url, { method: 'DELETE', headers: authHeaders() }).then(function (r) { return r.json() }).then(cb).catch(function (e) { toast('Error: ' + e.message, true) }) }
+    function v(id) { return document.getElementById(id).value.trim() }
+    function vn(id) { return document.getElementById(id).value }
+    function fmtDate(d) { return d ? d.split('T')[0] : '-' }
+    function searchTable(id, kw) { document.getElementById(id).querySelectorAll('tr').forEach(function (r) { r.style.display = r.textContent.toLowerCase().includes(kw.toLowerCase()) ? '' : 'none' }) }
+    function setCount(id, n) { var el = document.getElementById(id); if (el) el.textContent = n + ' record' + (n === 1 ? '' : 's') }
+    function setSelectOptions(id, rows, placeholder) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var html = ['<option value="">' + (placeholder || 'Select...') + '</option>'];
+      rows.forEach(function (row) {
+        html.push('<option value="' + row.hospital_id + '">' + row.hospital_id + ' - ' + row.name + ' (' + row.city + ')</option>');
+      });
+      el.innerHTML = html.join('');
+    }
+    function setCustomSelectOptions(id, rows, placeholder, getValue, getLabel) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var html = ['<option value="">' + (placeholder || 'Select...') + '</option>'];
+      rows.forEach(function (row) {
+        html.push('<option value="' + getValue(row) + '">' + getLabel(row) + '</option>');
+      });
+      el.innerHTML = html.join('');
+    }
+    function setAutoIdValue(id, value) {
+      var el = document.getElementById(id);
+      if (el && value !== undefined && value !== null) el.value = value;
+    }
+    function refreshAutoIds() {
+      get('/meta/next-ids', function (r) {
+        if (!r || r.error) return;
+        setAutoIdValue('h-id', r.hospital_id);
+        setAutoIdValue('p-id', r.patient_id);
+        setAutoIdValue('d-id', r.doctor_id);
+        setAutoIdValue('n-id', r.nurse_id);
+        setAutoIdValue('st-id', r.staff_id);
+        setAutoIdValue('a-id', r.appointment_id);
+        setAutoIdValue('tr-id', r.treatment_id);
+        setAutoIdValue('b-id', r.bill_id);
+        setAutoIdValue('rm-id', r.room_id);
+        setAutoIdValue('ad-id', r.admission_id);
+        setAutoIdValue('ph-id', r.medication_id);
+        setAutoIdValue('rp-id', r.report_id);
+        setAutoIdValue('pr-id', r.prescription_id);
+        setAutoIdValue('ins-id', r.insurance_id);
+        setAutoIdValue('ec-id', r.contact_id);
+        setAutoIdValue('fb-id', r.feedback_id);
+      });
+    }
+    function initAdminFriendlyForms() {
+      if (session.role !== 'admin') return;
+
+      get('/patients', function (rows) {
+        if (!rows || rows.error) return;
+        setCustomSelectOptions('b-pid', rows, 'Select patient...', function (p) { return p.patient_id; }, function (p) { return p.name + ' (' + p.patient_id + ')'; });
+        setCustomSelectOptions('ad-pid', rows, 'Select patient...', function (p) { return p.patient_id; }, function (p) { return p.name + ' (' + p.patient_id + ')'; });
+        setCustomSelectOptions('ins-pid', rows, 'Select patient...', function (p) { return p.patient_id; }, function (p) { return p.name + ' (' + p.patient_id + ')'; });
+        setCustomSelectOptions('ec-pid', rows, 'Select patient...', function (p) { return p.patient_id; }, function (p) { return p.name + ' (' + p.patient_id + ')'; });
+        setCustomSelectOptions('fb-pid', rows, 'Select patient...', function (p) { return p.patient_id; }, function (p) { return p.name + ' (' + p.patient_id + ')'; });
+      });
+
+      get('/doctors', function (rows) {
+        if (!rows || rows.error) return;
+        setCustomSelectOptions('ad-did', rows, 'Select doctor...', function (d) { return d.doctor_id; }, function (d) { return d.name + ' (' + d.doctor_id + ')'; });
+        setCustomSelectOptions('fb-did', rows, 'Select doctor...', function (d) { return d.doctor_id; }, function (d) { return d.name + ' (' + d.doctor_id + ')'; });
+      });
+
+      get('/rooms', function (rows) {
+        if (!rows || rows.error) return;
+        setCustomSelectOptions('ad-rid', rows, 'Select room...', function (r) { return r.room_id; }, function (r) { return r.room_number + ' (' + r.room_id + ')'; });
+      });
+
+      get('/treatments', function (rows) {
+        if (!rows || rows.error) return;
+        if (rows.length) {
+          var latestTreatmentId = rows.reduce(function (maxId, t) {
+            return Number(t.treatment_id) > maxId ? Number(t.treatment_id) : maxId;
+          }, 0);
+          setAutoIdValue('rp-tid', latestTreatmentId);
+        } else {
+          setAutoIdValue('rp-tid', '');
+        }
+        setCustomSelectOptions('b-tid', rows, 'Select treatment...', function (t) { return t.treatment_id; }, function (t) {
+          return (t.patient_name || 'Patient') + ' | ' + (t.diagnosis || 'Treatment') + ' (' + t.treatment_id + ')';
+        });
+        setCustomSelectOptions('nt-tid', rows, 'Select treatment...', function (t) { return t.treatment_id; }, function (t) {
+          return (t.patient_name || 'Patient') + ' | ' + (t.diagnosis || 'Treatment') + ' (' + t.treatment_id + ')';
+        });
+      });
+
+      get('/appointments', function (rows) {
+        if (!rows || rows.error) return;
+        if (rows.length) {
+          var latestAppointmentId = rows.reduce(function (maxId, a) {
+            return Number(a.appointment_id) > maxId ? Number(a.appointment_id) : maxId;
+          }, 0);
+          setAutoIdValue('tr-aptid', latestAppointmentId);
+        } else {
+          setAutoIdValue('tr-aptid', '');
+        }
+      });
+
+      get('/nurses', function (rows) {
+        if (!rows || rows.error) return;
+        setCustomSelectOptions('nt-nid', rows, 'Select nurse...', function (n) { return n.nurse_id; }, function (n) {
+          return n.name + ' | ' + (n.department || 'Nurse') + ' (' + n.nurse_id + ')';
+        });
+      });
+
+      get('/hospitals', function (rows) {
+        if (!rows || rows.error) return;
+        setCustomSelectOptions('d-hid', rows, 'Select hospital...', function (h) { return h.hospital_id; }, function (h) {
+          return h.name + (h.city ? ' (' + h.city + ')' : '') + ' [' + h.hospital_id + ']';
+        });
+        setCustomSelectOptions('n-hid', rows, 'Select hospital...', function (h) { return h.hospital_id; }, function (h) {
+          return h.name + (h.city ? ' (' + h.city + ')' : '') + ' [' + h.hospital_id + ']';
+        });
+        setCustomSelectOptions('st-hid', rows, 'Select hospital...', function (h) { return h.hospital_id; }, function (h) {
+          return h.name + (h.city ? ' (' + h.city + ')' : '') + ' [' + h.hospital_id + ']';
+        });
+        setCustomSelectOptions('fb-hid', rows, 'Select hospital...', function (h) { return h.hospital_id; }, function (h) {
+          return h.name + (h.city ? ' (' + h.city + ')' : '') + ' [' + h.hospital_id + ']';
+        });
+      });
+    }
+    function setFieldVisibility(id, visible) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = visible ? '' : 'none';
+    }
+    function initPatientFriendlyForms() {
+      if (session.role !== 'patient') return;
+      setAutoIdValue('ec-pid', session.id);
+      setAutoIdValue('fb-pid', session.id);
+      setFieldVisibility('ec-id-field', false);
+      setFieldVisibility('ec-pid-field', false);
+      setFieldVisibility('fb-id-field', false);
+      setFieldVisibility('fb-pid-field', false);
+      setFieldVisibility('fb-did-field', false);
+      setFieldVisibility('fb-hid-field', false);
+      setFieldVisibility('fb-doctor-select-field', true);
+      setFieldVisibility('fb-hospital-select-field', true);
+      setFieldVisibility('add-presc-card', false);
+
+      get('/patient-completed-doctors', function (rows) {
+        var el = document.getElementById('fb-did-select');
+        if (!el || !rows || rows.error) return;
+        var html = ['<option value="">Select a doctor...</option>'];
+        rows.forEach(function (d) {
+          html.push('<option value="' + d.doctor_id + '">' + d.name + (d.specialization ? ' (' + d.specialization + ')' : '') + '</option>');
+        });
+        el.innerHTML = html.join('');
+      });
+
+      get('/hospitals', function (rows) {
+        var el = document.getElementById('fb-hid-select');
+        if (!el || !rows || rows.error) return;
+        var html = ['<option value="">Select a hospital...</option>'];
+        rows.forEach(function (h) {
+          html.push('<option value="' + h.hospital_id + '">' + h.name + (h.city ? ' (' + h.city + ')' : '') + '</option>');
+        });
+        el.innerHTML = html.join('');
+      });
+    }
+    function refreshPatientHospitalOptions(rows) {
+      hospitalOptions = rows || hospitalOptions;
+      setSelectOptions('p-hid', hospitalOptions, 'Select hospital...');
+    }
+    function loadPatientFormMeta() {
+      if (session.role !== 'admin') return;
+      refreshAutoIds();
+      get('/hospitals', function (rows) {
+        if (rows && !rows.error) refreshPatientHospitalOptions(rows);
+      });
+    }
+    function loadPrescriptionMedicineOptions(selectedId) {
+      get('/medicine-options', function (rows) {
+        var hint = document.getElementById('pr-stock-hint');
+        if (!rows || rows.error) {
+          if (hint) hint.textContent = rows && rows.error ? rows.error : 'Unable to load medicines.';
+          return;
+        }
+        var el = document.getElementById('pr-mid');
+        if (!el) return;
+        var opts = ['<option value="">Select medicine...</option>'];
+        rows.forEach(function (m) {
+          opts.push('<option value="' + m.medication_id + '"' + (String(selectedId || '') === String(m.medication_id) ? ' selected' : '') + '>' +
+            m.name + ' | Stock: ' + m.stock_quantity + ' | Unit: ' + (m.unit || '-') + '</option>');
+        });
+        el.innerHTML = opts.join('');
+        updatePrescriptionStockHint();
+      });
+    }
+    function loadPrescriptionTreatmentOptions(selectedId) {
+      get('/treatments', function (rows) {
+        var el = document.getElementById('pr-tid');
+        if (!el) return;
+        if (!rows || rows.error) {
+          el.innerHTML = '<option value="">Unable to load treatments</option>';
+          return;
+        }
+        var opts = ['<option value="">Select treatment...</option>'];
+        rows.forEach(function (t) {
+          opts.push('<option value="' + t.treatment_id + '"' + (String(selectedId || '') === String(t.treatment_id) ? ' selected' : '') + '>' +
+            'Treatment #' + t.treatment_id + ' | ' + (t.diagnosis || 'No diagnosis') + '</option>');
+        });
+        el.innerHTML = opts.join('');
+      });
+    }
+    function updatePrescriptionStockHint() {
+      var hint = document.getElementById('pr-stock-hint');
+      var el = document.getElementById('pr-mid');
+      if (!hint || !el) return;
+      var txt = el.options && el.selectedIndex >= 0 ? el.options[el.selectedIndex].text : '';
+      hint.textContent = el.value ? txt : 'Select a medicine to see current stock.';
+    }
+    function resetPatientForm() {
+      ['p-name', 'p-dob', 'p-age', 'p-gender', 'p-blood', 'p-phone', 'p-address', 'p-history'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      var hid = document.getElementById('p-hid');
+      if (hid) hid.value = '';
+    }
+
+    // ── Validation ──
+    function badPhone(p) { return p && !/^\d{10}$/.test(p) }
+    function badEmail(e) { return e && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) }
+    function futureDOB(d) { return d && new Date(d) > new Date() }
+
+    // ── Badge helpers ──
+    function badge(txt, cls) { return '<span class="badge ' + cls + '">' + txt + '</span>' }
+    function statusBadge(s) { var m = { 'Completed': 'bg', 'Paid': 'bg', 'Available': 'bg', 'Pending': 'bo', 'Due': 'br', 'Postponed': 'bgr', 'Occupied': 'br', 'Under Maintenance': 'bo' }; return badge(s, m[s] || 'bb') }
+    function ab(label, cls, onclick) {
+      var fn = (onclick || '').split('(')[0];
+      if (!canRunAction(fn)) return '';
+      var icon = label;
+      if (label === 'Edit') icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>';
+      else if (label === 'Del' || label === 'Delete') icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+      else if (label === 'Treat') icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>';
+      else if (label === 'Book') icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+      else if (label === 'Status') icon = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+      return '<button class="ab icon-btn ' + cls + '" title="' + label + '" onclick="' + onclick + '">' + icon + '</button>';
+    }
+
+    // ── Modal helpers ──
+    function openModal(title, bodyHTML, saveFn) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = bodyHTML;
+      modalSaveFn = saveFn;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+    function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); modalSaveFn = null }
+    function saveModal() { if (modalSaveFn) modalSaveFn() }
+    document.getElementById('modal-overlay').addEventListener('click', function (e) { if (e.target === this) closeModal() })
+
+    // ── Stats ──
+    function loadStats() {
+      if (session.role === 'doctor') loadDoctorCalendar();
+      get('/stats', function (d) {
+        // Hide admin-only stats
+        document.getElementById('s-hospitals').parentElement.style.display = (session.role === 'admin') ? '' : 'none';
+        document.getElementById('s-patients').parentElement.style.display = (session.role === 'admin') ? '' : 'none';
+        document.getElementById('s-doctors').parentElement.style.display = (session.role === 'admin') ? '' : 'none';
+        document.getElementById('s-pending_bills').parentElement.style.display = (session.role === 'admin') ? '' : 'none';
+        document.getElementById('s-revenue').parentElement.style.display = (session.role === 'admin') ? '' : 'none';
+        
+        // Show stats visible for this role
+        if (session.role === 'admin') {
+          document.getElementById('s-hospitals').textContent = '—';
+          document.getElementById('s-patients').textContent = d.patients;
+          document.getElementById('s-doctors').textContent = d.doctors;
+          document.getElementById('s-appointments').textContent = d.appointments;
+          document.getElementById('s-rooms').textContent = d.rooms;
+          document.getElementById('s-pending_bills').textContent = d.pending_bills;
+          document.getElementById('s-revenue').textContent = Number(d.revenue).toLocaleString('en-IN');
+        } else {
+          // Non-admin: show appointments and rooms available
+          document.getElementById('s-appointments').textContent = d.appointments;
+          document.getElementById('s-rooms').textContent = d.rooms;
+        }
+      });
+      // hospitals count separately
+      if (session.role === 'admin') {
+        get('/hospitals', function (rows) { 
+          document.getElementById('s-hospitals').textContent = rows.length;
+        });
+      }
+    }
+
+    // ════════════════════════════════
+    // HOSPITALS
+    // ════════════════════════════════
+    function loadHospitals() {
+      get('/hospitals', function (rows) {
+        setCount('hospital-count', rows.length);
+        refreshPatientHospitalOptions(rows);
+        var html = '';
+        rows.forEach(function (h) {
+          html += '<tr><td>' + h.hospital_id + '</td><td><b>' + h.name + '</b></td><td>' + h.city + '</td>' +
+            '<td>' + h.num_doctors + '</td><td>' + h.num_staff + '</td><td>' + h.num_patients + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editHospital(' + h.hospital_id + ',\'' + h.name.replace(/'/g, "\\'") + '\',' +
+              '\'' + h.city + '\',' + h.num_doctors + ',' + h.num_staff + ',' + h.num_patients + ')') +
+            ab('Del', 'ab-del', 'delHospital(' + h.hospital_id + ')') + '</td></tr>';
+        });
+        document.getElementById('hospital-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No hospitals</div></td></tr>';
+      });
+    }
+    function addHospital() {
+      var name = v('h-name'), city = v('h-city'), docs = vn('h-docs'), staff = vn('h-staff'), pats = vn('h-pats');
+      if (!name || !city || !docs || !staff) { toast('Fill all required fields', true); return }
+      post('/hospitals', { name: name, city: city, num_doctors: docs, num_staff: staff, num_patients: pats || 0 },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Hospital ID: ' + r.hospital_id); refreshAutoIds(); loadHospitals() });
+    }
+    function editHospital(id, name, city, docs, staff, pats) {
+      openModal('Edit Hospital',
+        '<div class="field"><label>Name *</label><input id="eh-name" value="' + name + '"/></div>' +
+        '<div class="field"><label>City *</label><input id="eh-city" value="' + city + '"/></div>' +
+        '<div class="fr2"><div class="field"><label>No. Doctors</label><input type="number" id="eh-docs" value="' + docs + '"/></div>' +
+        '<div class="field"><label>No. Staff</label><input type="number" id="eh-staff" value="' + staff + '"/></div></div>' +
+        '<div class="field"><label>No. Patients</label><input type="number" id="eh-pats" value="' + pats + '"/></div>',
+        function () {
+          put('/hospitals/' + id, { name: v('eh-name'), city: v('eh-city'), num_doctors: vn('eh-docs'), num_staff: vn('eh-staff'), num_patients: vn('eh-pats') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadHospitals() });
+        });
+    }
+    function delHospital(id) {
+      if (!confirm('Delete hospital #' + id + '? This will fail if it has linked records.')) return;
+      del('/hospitals/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadHospitals() });
+    }
+
+    // ════════════════════════════════
+    // PATIENTS
+    // ════════════════════════════════
+    function loadPatients() {
+      loadPatientFormMeta();
+      get('/patients', function (rows) {
+        setCount('patient-count', rows.length);
+        var html = '';
+        rows.forEach(function (p) {
+          html += '<tr><td>' + p.patient_id + '</td><td><b>' + p.name + '</b></td>' +
+            '<td>' + (p.age !== null ? p.age : '-') + '</td><td>' + (p.gender || '-') + '</td><td>' + (p.phone || '-') + '</td>' +
+            '<td>' + (p.blood_group ? badge(p.blood_group, 'bp') : '-') + '</td><td>' + p.hospital_id + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editPatient(' + p.patient_id + ',\'' + p.name.replace(/'/g, "\\'") + '\',\'' +
+              (p.gender || '') + '\',\'' + (p.phone || '') + '\',\'' + (p.address || '') + '\',\'' + (p.blood_group || '') + '\',\'' +
+              (p.medical_history || '').replace(/'/g, "\\'").replace(/\n/g, ' ') + '\')') +
+            ab('Del', 'ab-del', 'delPatient(' + p.patient_id + ')') + '</td></tr>';
+        });
+        document.getElementById('patient-tbody').innerHTML = html || '<tr><td colspan="8"><div class="empty">No patients</div></td></tr>';
+        loadPatientLogins();
+      });
+    }
+    function addPatient() {
+      var hid = v('p-hid'), name = v('p-name'), dob = v('p-dob'), gender = v('p-gender'), blood = v('p-blood');
+      if (!hid || !name || !dob || !gender || !blood) { toast('Fill all required fields', true); return }
+      if (futureDOB(dob)) { toast('DOB cannot be in the future', true); return }
+      if (badPhone(v('p-phone'))) { toast('Phone must be 10 digits', true); return }
+      post('/patients', {
+        hospital_id: hid, name: name, age: v('p-age') || null, dob: dob, gender: gender,
+        phone: v('p-phone') || null, address: v('p-address') || null, blood_group: blood, medical_history: v('p-history') || null
+      },
+        function (r) {
+          if (r.error) { toast(r.error, true); return }
+          toast(r.message + ' Patient ID: ' + r.patient_id);
+          var loginId = document.getElementById('pl-id');
+          if (loginId) loginId.value = r.patient_id;
+          resetPatientForm();
+          loadPatients();
+        });
+    }
+    function editPatient(id, name, gender, phone, address, blood, history) {
+      openModal('Edit Patient',
+        '<div class="field"><label>Name *</label><input id="ep-name" value="' + name + '"/></div>' +
+        '<div class="fr2"><div class="field"><label>Gender</label><select id="ep-gender"><option>Male</option><option>Female</option><option>Others</option></select></div>' +
+        '<div class="field"><label>Blood Group</label><select id="ep-blood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div></div>' +
+        '<div class="field"><label>Phone</label><input id="ep-phone" value="' + phone + '"/></div>' +
+        '<div class="field"><label>Address</label><input id="ep-address" value="' + address + '"/></div>' +
+        '<div class="field"><label>Medical History</label><textarea id="ep-history">' + history + '</textarea></div>',
+        function () {
+          document.getElementById('ep-gender').value = gender;
+          document.getElementById('ep-blood').value = blood;
+          put('/patients/' + id, {
+            name: v('ep-name'), gender: v('ep-gender'), phone: v('ep-phone') || null,
+            address: v('ep-address') || null, blood_group: v('ep-blood'), medical_history: v('ep-history') || null
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadPatients() });
+        });
+      // set select values after render
+      setTimeout(function () {
+        document.getElementById('ep-gender').value = gender;
+        document.getElementById('ep-blood').value = blood;
+      }, 10);
+    }
+    function delPatient(id) {
+      if (!confirm('Delete patient #' + id + '?')) return;
+      del('/patients/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadPatients() });
+    }
+
+    // Admin: create patient login
+    function addPatientUser() {
+      var pid = v('pl-id'), uname = v('pl-username'), pwd = v('pl-password');
+      if (!pid || !uname || !pwd) { toast('Fill patient id, username, password', true); return }
+      post('/users', { id: pid, username: uname, password: pwd, role: 'patient' },
+        function (r) { if (r.error) { toast(r.error, true); return } toast('Login created for patient #' + r.id); loadPatientLogins(); });
+    }
+
+    function loadPatientLogins() {
+      if (session.role !== 'admin') return;
+      get('/users?role=patient', function (rows) {
+        var html = '';
+        rows.forEach(function (u) {
+          html += '<tr><td>' + u.id + '</td><td>' + u.username + '</td><td>' + u.password + '</td></tr>';
+        });
+        document.getElementById('pl-body').innerHTML = html || '<tr><td colspan="3"><div class="empty">No logins</div></td></tr>';
+        setCount('pl-count', rows.length);
+      });
+    }
+
+    // ════════════════════════════════
+    // DOCTORS
+    // ════════════════════════════════
+    function loadDoctors() {
+      get('/doctors', function (rows) {
+        setCount('doctor-count', rows.length);
+        var html = '';
+        rows.forEach(function (d) {
+          var actions = '';
+          if (session.role === 'patient') {
+            var safeName = (d.name || '').replace(/'/g, "\\'");
+            actions = '<button class="ab ab-book" onclick="bookWithDoctor(' + d.doctor_id + ',\'' + safeName + '\')">Book</button>';
+          } else {
+            actions = ab('Edit', 'ab-edit', 'editDoctor(' + d.doctor_id + ',\'' + d.name.replace(/'/g, "\\'") + '\',\'' +
+              (d.specialization || '') + '\',\'' + (d.phone || '') + '\',\'' + (d.email || '') + '\',' +
+              (d.experience_years || 0) + ',\'' + d.schedule.replace(/'/g, "\\'") + '\')') +
+              ab('Del', 'ab-del', 'delDoctor(' + d.doctor_id + ')');
+          }
+          html += '<tr><td>' + d.doctor_id + '</td><td><b>' + d.name + '</b></td><td>' + badge(d.specialization || '-', 'bb') + '</td>' +
+            '<td>' + (d.phone || '-') + '</td><td>' + (d.experience_years || '-') + ' yrs</td><td>' + (d.schedule || '-') + '</td>' +
+            '<td>' + actions + '</td></tr>';
+        });
+        document.getElementById('doctor-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No doctors</div></td></tr>';
+        loadDoctorLogins();
+      });
+    }
+    function addDoctor() {
+      var hid = v('d-hid'), name = v('d-name'), dob = v('d-dob'), spec = v('d-spec'), sched = v('d-schedule');
+      if (!hid || !name || !dob || !spec || !sched) { toast('Fill all required fields', true); return }
+      if (futureDOB(dob)) { toast('DOB cannot be in the future', true); return }
+      if (badPhone(v('d-phone'))) { toast('Phone must be 10 digits', true); return }
+      if (badEmail(v('d-email'))) { toast('Invalid email', true); return }
+      post('/doctors', {
+        hospital_id: hid, name: name, dob: dob, specialization: spec,
+        phone: v('d-phone') || null, email: v('d-email') || null, experience_years: v('d-exp') || null, schedule: sched
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Doctor ID: ' + r.doctor_id); refreshAutoIds(); loadDoctors() });
+    }
+    function editDoctor(id, name, spec, phone, email, exp, sched) {
+      var specs = ['Cardiology', 'Cardiac Surgery', 'Neurology', 'Neurosurgery', 'Orthopaedics', 'Obstetrics', 'Gynaecology', 'Gastroenterology', 'Paediatrics', 'Pulmonology', 'Urology', 'Dermatology', 'ENT'];
+      var specOpts = specs.map(function (s) { return '<option' + (s === spec ? ' selected' : '') + '>' + s + '</option>' }).join('');
+      openModal('Edit Doctor',
+        '<div class="field"><label>Name *</label><input id="ed-name" value="' + name + '"/></div>' +
+        '<div class="field"><label>Specialization *</label><select id="ed-spec">' + specOpts + '</select></div>' +
+        '<div class="fr2"><div class="field"><label>Phone</label><input id="ed-phone" value="' + phone + '"/></div>' +
+        '<div class="field"><label>Experience (yrs)</label><input type="number" id="ed-exp" value="' + exp + '"/></div></div>' +
+        '<div class="field"><label>Email</label><input type="email" id="ed-email" value="' + email + '"/></div>' +
+        '<div class="field"><label>Schedule *</label><input id="ed-sched" value="' + sched + '"/></div>',
+        function () {
+          put('/doctors/' + id, {
+            name: v('ed-name'), specialization: v('ed-spec'), phone: v('ed-phone') || null,
+            email: v('ed-email') || null, experience_years: v('ed-exp') || null, schedule: v('ed-sched')
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadDoctors() });
+        });
+    }
+    function delDoctor(id) {
+      if (!confirm('Delete doctor #' + id + '?')) return;
+      del('/doctors/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadDoctors() });
+    }
+
+    // Admin: create doctor login
+    function addDoctorUser() {
+      var did = v('dl-id'), uname = v('dl-username'), pwd = v('dl-password');
+      if (!did || !uname || !pwd) { toast('Fill doctor id, username, password', true); return }
+      post('/users', { id: did, username: uname, password: pwd, role: 'doctor' },
+        function (r) { if (r.error) { toast(r.error, true); return } toast('Login created for doctor #' + r.id); loadDoctorLogins(); });
+    }
+
+    function loadDoctorLogins() {
+      if (session.role !== 'admin') return;
+      get('/users?role=doctor', function (rows) {
+        var html = '';
+        rows.forEach(function (u) {
+          html += '<tr><td>' + u.id + '</td><td>' + u.username + '</td><td>' + u.password + '</td></tr>';
+        });
+        document.getElementById('dl-body').innerHTML = html || '<tr><td colspan="3"><div class="empty">No logins</div></td></tr>';
+        setCount('dl-count', rows.length);
+      });
+    }
+
+    // ════════════════════════════════
+    // NURSES
+    // ════════════════════════════════
+    function loadNurses() {
+      get('/nurses', function (rows) {
+        setCount('nurse-count', rows.length);
+        var html = '';
+        rows.forEach(function (n) {
+          html += '<tr><td>' + n.nurse_id + '</td><td><b>' + n.name + '</b></td><td>' + (n.department || '-') + '</td>' +
+            '<td>' + badge(n.shift || '-', 'bgr') + '</td><td>' + (n.phone || '-') + '</td><td>' + (n.experience_years || '-') + ' yrs</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editNurse(' + n.nurse_id + ',\'' + n.name.replace(/'/g, "\\'") + '\',\'' +
+              (n.department || '') + '\',\'' + (n.phone || '') + '\',\'' + (n.email || '') + '\',\'' + n.shift + '\',' +
+              (n.experience_years || 0) + ')') + ab('Del', 'ab-del', 'delNurse(' + n.nurse_id + ')') + '</td></tr>';
+        });
+        document.getElementById('nurse-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No nurses</div></td></tr>';
+      });
+    }
+    function addNurse() {
+      var name = v('n-name'), hid = v('n-hid'), dob = v('n-dob'), dept = v('n-dept'), shift = v('n-shift');
+      if (!name || !hid || !dob || !dept || !shift) { toast('Fill all required fields', true); return }
+      if (futureDOB(dob)) { toast('DOB cannot be in the future', true); return }
+      if (badPhone(v('n-phone'))) { toast('Phone must be 10 digits', true); return }
+      post('/nurses', {
+        name: name, hospital_id: hid, dob: dob, department: dept,
+        phone: v('n-phone') || null, email: v('n-email') || null, shift: shift, experience_years: v('n-exp') || null
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Nurse ID: ' + r.nurse_id); refreshAutoIds(); loadNurses() });
+    }
+    function editNurse(id, name, dept, phone, email, shift, exp) {
+      var depts = ['Medical-Surgical', 'Intensive Care', 'Emergency Room', 'Operating Room', 'Obstetrics', 'Oncology', 'Pediatrics', 'Geriatrics'];
+      var dOpts = depts.map(function (d) { return '<option' + (d === dept ? ' selected' : '') + '>' + d + '</option>' }).join('');
+      openModal('Edit Nurse',
+        '<div class="field"><label>Name *</label><input id="en-name" value="' + name + '"/></div>' +
+        '<div class="field"><label>Department *</label><select id="en-dept">' + dOpts + '</select></div>' +
+        '<div class="fr2"><div class="field"><label>Shift</label><select id="en-shift">' +
+        ['morning', 'Evening', 'Night'].map(function (s) { return '<option' + (s === shift ? ' selected' : '') + '>' + s + '</option>' }).join('') +
+        '</select></div><div class="field"><label>Experience (yrs)</label><input type="number" id="en-exp" value="' + exp + '"/></div></div>' +
+        '<div class="field"><label>Phone</label><input id="en-phone" value="' + phone + '"/></div>' +
+        '<div class="field"><label>Email</label><input type="email" id="en-email" value="' + email + '"/></div>',
+        function () {
+          put('/nurses/' + id, {
+            name: v('en-name'), department: v('en-dept'), phone: v('en-phone') || null,
+            email: v('en-email') || null, shift: v('en-shift'), experience_years: v('en-exp') || null
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadNurses() });
+        });
+    }
+    function delNurse(id) {
+      if (!confirm('Delete nurse #' + id + '?')) return;
+      del('/nurses/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadNurses() });
+    }
+
+    // ════════════════════════════════
+    // STAFF
+    // ════════════════════════════════
+    function loadStaff() {
+      get('/staff', function (rows) {
+        setCount('staff-count', rows.length);
+        var html = '';
+        rows.forEach(function (s) {
+          html += '<tr><td>' + s.staff_id + '</td><td><b>' + s.name + '</b></td><td>' + badge(s.occupation || '-', 'bgr') + '</td>' +
+            '<td>' + (s.age || '-') + '</td><td>' + (s.gender || '-') + '</td><td>' + (s.phone || '-') + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editStaff(' + s.staff_id + ',\'' + s.name.replace(/'/g, "\\'") + '\',\'' +
+              (s.occupation || '') + '\',\'' + (s.gender || '') + '\',\'' + (s.phone || '') + '\',\'' + (s.address || '') + '\',' + (s.age || 0) + ')') +
+            ab('Del', 'ab-del', 'delStaff(' + s.staff_id + ')') + '</td></tr>';
+        });
+        document.getElementById('staff-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No staff</div></td></tr>';
+      });
+    }
+    function addStaff() {
+      var name = v('st-name'), hid = v('st-hid'), occ = v('st-occ'), dob = v('st-dob'), gender = v('st-gender');
+      if (!name || !hid || !occ || !dob || !gender) { toast('Fill all required fields', true); return }
+      if (futureDOB(dob)) { toast('DOB cannot be in the future', true); return }
+      if (badPhone(v('st-phone'))) { toast('Phone must be 10 digits', true); return }
+      post('/staff', {
+        name: name, hospital_id: hid, occupation: occ, dob: dob,
+        age: v('st-age') || null, gender: gender, phone: v('st-phone') || null, address: v('st-address') || null
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Staff ID: ' + r.staff_id); refreshAutoIds(); loadStaff() });
+    }
+    function editStaff(id, name, occ, gender, phone, address, age) {
+      var occs = ['Cleaning', 'Cooking', 'Logistics', 'Accounts', 'Paramedic'];
+      var oOpts = occs.map(function (o) { return '<option' + (o === occ ? ' selected' : '') + '>' + o + '</option>' }).join('');
+      openModal('Edit Staff',
+        '<div class="field"><label>Name *</label><input id="es-name" value="' + name + '"/></div>' +
+        '<div class="field"><label>Occupation *</label><select id="es-occ">' + oOpts + '</select></div>' +
+        '<div class="fr2"><div class="field"><label>Gender</label><select id="es-gender">' +
+        ['Male', 'Female', 'Others'].map(function (g) { return '<option' + (g === gender ? ' selected' : '') + '>' + g + '</option>' }).join('') +
+        '</select></div><div class="field"><label>Age</label><input type="number" id="es-age" value="' + age + '"/></div></div>' +
+        '<div class="field"><label>Phone</label><input id="es-phone" value="' + phone + '"/></div>' +
+        '<div class="field"><label>Address</label><input id="es-address" value="' + address + '"/></div>',
+        function () {
+          put('/staff/' + id, {
+            name: v('es-name'), occupation: v('es-occ'), gender: v('es-gender'),
+            phone: v('es-phone') || null, address: v('es-address') || null, age: v('es-age') || null
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadStaff() });
+        });
+    }
+    function delStaff(id) {
+      if (!confirm('Delete staff #' + id + '?')) return;
+      del('/staff/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadStaff() });
+    }
+
+    // ════════════════════════════════
+    // APPOINTMENTS
+    // ════════════════════════════════
+    function startTreatment(aptid) {
+      document.querySelector('.nav-item[data-target="page-treatments"]').click();
+      var idField = document.getElementById('tr-aptid');
+      if (idField) {
+        idField.value = aptid;
+        idField.removeAttribute('disabled');
+      }
+      setTimeout(function() { document.getElementById('tr-diag').focus(); }, 100);
+    }
+
+    function quickStatusAppt(id, st) {
+      openModal('Update Appointment Status',
+        '<div class="field"><label>Status</label><select id="qs-status">' +
+          '<option value="Pending"' + (st==='Pending'?' selected':'') + '>Pending</option>' +
+          '<option value="Completed"' + (st==='Completed'?' selected':'') + '>Completed</option>' +
+          '<option value="Postponed"' + (st==='Postponed'?' selected':'') + '>Postponed</option>' +
+          '<option value="Due"' + (st==='Due'?' selected':'') + '>Due</option>' +
+        '</select></div>',
+        function () {
+          put('/appointments/' + id + '/status', { status: v('qs-status') }, function (r) {
+            if (r.error) { toast(r.error, true); return; }
+            toast(r.message); closeModal(); loadAppointments(); loadDoctorCalendar();
+          });
+        }
+      );
+    }
+
+    function loadAppointments() {
+      get('/appointments', function (rows) {
+        setCount('appt-count', rows.length);
+        var html = '';
+        rows.forEach(function (a) {
+          html += '<tr><td>' + a.appointment_id + '</td><td>' + a.patient_name + '</td><td>' + a.doctor_name + '</td>' +
+            '<td>' + fmtDate(a.appointment_date) + '</td><td>' + (a.appointment_time || '-') + '</td>' +
+            '<td>' + statusBadge(a.status) + '</td>' +
+            '<td>' + (session.role === 'doctor' ? ab('Status', 'ab-status', 'quickStatusAppt(' + a.appointment_id + ',\'' + a.status + '\')') : '') +
+            ab('Edit', 'ab-edit', 'editAppt(' + a.appointment_id + ',\'' + fmtDate(a.appointment_date) + '\',\'' +
+              (a.appointment_time || '') + '\',\'' + a.status + '\')') +
+            ab('Del', 'ab-del', 'delAppt(' + a.appointment_id + ')') + '</td></tr>';
+        });
+        document.getElementById('appt-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No appointments</div></td></tr>';
+      });
+      
+      // If doctor, populate referral form dropdowns
+      if (session.role === 'doctor') {
+        // Load patients (will be filtered by the server to show only doctor's patients)
+        get('/patients', function (patientsData) {
+          var patients = Array.isArray(patientsData) ? patientsData : (patientsData.rows || []);
+          var opt = '<option value="">Select a patient...</option>';
+          if (patients.length > 0) {
+            patients.forEach(function (p) { opt += '<option value="' + p.patient_id + '">' + p.patient_id + ' - ' + p.name + '</option>' });
+          }
+          var el = document.getElementById('ref-pid');
+          if (el) el.innerHTML = opt;
+        });
+        // Load all doctors except self
+        get('/doctors', function (doctorsData) {
+          var doctors = Array.isArray(doctorsData) ? doctorsData : (doctorsData.rows || []);
+          var opt = '<option value="">Select a doctor...</option>';
+          if (doctors.length > 0) {
+            doctors.forEach(function (d) {
+              if (d.doctor_id != session.id) {
+                opt += '<option value="' + d.doctor_id + '">' + d.doctor_id + ' - ' + d.name + ' (' + d.specialization + ')</option>';
+              }
+            });
+          }
+          var el = document.getElementById('ref-did');
+          if (el) el.innerHTML = opt;
+        });
+      }
+    }
+    function addAppointment() {
+      var pid = v('a-pid'), did = v('a-did'), date = v('a-date'), time = v('a-time'), status = v('a-status');
+      if (!pid || !did || !date || !time || !status) { toast('Fill all required fields', true); return }
+      post('/appointments', { patient_id: pid, doctor_id: did, appointment_date: date, appointment_time: time, status: status },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Appointment ID: ' + r.appointment_id); refreshAutoIds(); loadAppointments() });
+    }
+    function editAppt(id, date, time, status) {
+      var statuses = ['Pending', 'Completed', 'Postponed', 'Due'];
+      var sOpts = statuses.map(function (s) { return '<option' + (s === status ? ' selected' : '') + '>' + s + '</option>' }).join('');
+      openModal('Edit Appointment',
+        '<div class="fr2"><div class="field"><label>Date</label><input type="date" id="ea-date" value="' + date + '"/></div>' +
+        '<div class="field"><label>Time</label><input type="time" id="ea-time" value="' + time + '"/></div></div>' +
+        '<div class="field"><label>Status *</label><select id="ea-status">' + sOpts + '</select></div>',
+        function () {
+          put('/appointments/' + id, { appointment_date: v('ea-date'), appointment_time: v('ea-time'), status: v('ea-status') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadAppointments() });
+        });
+    }
+    function delAppt(id) {
+      if (!confirm('Delete appointment #' + id + '?')) return;
+      del('/appointments/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadAppointments() });
+    }
+    
+    function referPatient() {
+      var pid = v('ref-pid'), did = v('ref-did'), date = v('ref-date'), time = v('ref-time'), status = v('ref-status');
+      if (!pid || !did || !date || !time || !status) { toast('Fill all required fields', true); return }
+      if (did == session.id) { toast('Cannot refer to yourself. Select a different doctor.', true); return }
+      post('/appointments', { patient_id: pid, doctor_id: did, appointment_date: date, appointment_time: time, status: status },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); document.getElementById('ref-pid').value = ''; document.getElementById('ref-did').value = ''; loadAppointments() });
+    }
+
+    // Patient booking from Doctors page (date & time only)
+    function bookWithDoctor(did, name) {
+      if (session.role !== 'patient') return;
+      openModal('Book with ' + name,
+        '<div class="field"><label>Date *</label><input type="date" id="bk-date" /></div>' +
+        '<div class="field"><label>Time *</label><input type="time" id="bk-time" /></div>' +
+        '<div class="field"><label>Illness Description</label><textarea id="bk-illness" placeholder="Describe your symptoms or reason for visit"></textarea></div>',
+        function () {
+          var date = v('bk-date'), time = v('bk-time');
+          if (!date || !time) { toast('Choose date and time', true); return }
+          post('/appointments', { doctor_id: did, appointment_date: date, appointment_time: time, illness_description: v('bk-illness') || null },
+            function (r) {
+              if (r.error) { toast(r.error, true); return }
+              toast('Appointment booked');
+              closeModal();
+              loadAppointments();
+              // Jump to appointments page to show booking
+              show('appointments');
+            });
+        });
+    }
+
+    // ════════════════════════════════
+    // TREATMENTS
+    // ════════════════════════════════
+    function loadTreatments() {
+      get('/treatments', function (rows) {
+        setCount('treat-count', rows.length);
+        var html = '';
+        rows.forEach(function (t) {
+          html += '<tr><td>' + t.treatment_id + '</td><td>' + t.patient_name + '</td><td>' + t.doctor_name + '</td>' +
+            '<td>' + t.diagnosis + '</td><td>' + (t.prescription || '-') + '</td><td>' + fmtDate(t.treatment_date) + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editTreatment(' + t.treatment_id + ',\'' + t.diagnosis.replace(/'/g, "\\'") + '\',\'' +
+              (t.treatment_description || '').replace(/'/g, "\\'") + '\',\'' + (t.prescription || '').replace(/'/g, "\\'") + '\',\'' + fmtDate(t.treatment_date) + '\')') +
+            ab('Del', 'ab-del', 'delTreatment(' + t.treatment_id + ')') + '</td></tr>';
+        });
+        document.getElementById('treat-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No treatments</div></td></tr>';
+      });
+    }
+    function addTreatment() {
+      var aptid = v('tr-aptid'), date = v('tr-date'), diag = v('tr-diag');
+      if (!aptid || !date || !diag) { toast('Fill all required fields', true); return }
+      post('/treatments', {
+        appointment_id: aptid, treatment_date: date, diagnosis: diag,
+        treatment_description: v('tr-desc') || null, prescription: v('tr-presc') || null
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Treatment ID: ' + r.treatment_id); refreshAutoIds(); loadTreatments() });
+    }
+    function editTreatment(id, diag, desc, presc, date) {
+      openModal('Edit Treatment',
+        '<div class="field"><label>Diagnosis *</label><input id="et-diag" value="' + diag + '"/></div>' +
+        '<div class="field"><label>Description</label><input id="et-desc" value="' + desc + '"/></div>' +
+        '<div class="field"><label>Prescription</label><input id="et-presc" value="' + presc + '"/></div>' +
+        '<div class="field"><label>Date</label><input type="date" id="et-date" value="' + date + '"/></div>',
+        function () {
+          put('/treatments/' + id, {
+            diagnosis: v('et-diag'), treatment_description: v('et-desc') || null,
+            prescription: v('et-presc') || null, treatment_date: v('et-date')
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadTreatments() });
+        });
+    }
+    function delTreatment(id) {
+      if (!confirm('Delete treatment #' + id + '?')) return;
+      del('/treatments/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadTreatments() });
+    }
+
+    // ════════════════════════════════
+    // BILLS
+    // ════════════════════════════════
+    function loadBills() {
+      get('/bills', function (rows) {
+        setCount('bill-count', rows.length);
+        var html = '';
+        rows.forEach(function (b) {
+          var actions = '';
+          if (session.role === 'patient') {
+            actions = b.payment_status === 'Pending'
+              ? '<button class="ab ab-edit" onclick="payBillPlaceholder(' + b.bill_id + ')">To pay</button>'
+              : '<span style="color:#64748b">Paid</span>';
+          } else {
+            actions = ab('Edit', 'ab-edit', 'editBill(' + b.bill_id + ',' + b.total_amount + ',\'' + b.payment_status + '\',\'' + b.payment_mode + '\')') +
+              ab('Del', 'ab-del', 'delBill(' + b.bill_id + ')');
+          }
+          html += '<tr><td>' + b.bill_id + '</td><td>' + b.patient_name + '</td>' +
+            '<td>₹' + Number(b.total_amount).toLocaleString('en-IN') + '</td>' +
+            '<td>' + statusBadge(b.payment_status) + '</td><td>' + (b.payment_mode || '-') + '</td>' +
+            '<td>' + fmtDate(b.bill_date) + '</td>' +
+            '<td>' + actions + '</td></tr>';
+        });
+        document.getElementById('bill-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No bills</div></td></tr>';
+      });
+    }
+    function payBillPlaceholder(id) {
+      if (session.role !== 'patient') return;
+      alert('Payment for bill #' + id + ' is under development...');
+    }
+    function addBill() {
+      var pid = v('b-pid'), amt = v('b-amount'), status = v('b-status'), mode = v('b-mode'), date = v('b-date');
+      if (!pid || !amt || !status || !mode || !date) { toast('Fill all required fields', true); return }
+      post('/bills', { patient_id: pid, total_amount: amt, payment_status: status, payment_mode: mode, bill_date: date, treatment_id: v('b-tid') || null },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Bill ID: ' + r.bill_id); refreshAutoIds(); loadBills() });
+    }
+    function editBill(id, amt, status, mode) {
+      var modes = ['Cash', 'Card', 'UPI', 'Cheque', 'Net Banking', 'Bank Transfer'];
+      var mOpts = modes.map(function (m) { return '<option' + (m === mode ? ' selected' : '') + '>' + m + '</option>' }).join('');
+      openModal('Edit Bill <small style="font-size:11px;color:#d97706">(Trigger: Pending→Paid auto-sets date)</small>',
+        '<div class="field"><label>Amount (₹)</label><input type="number" id="eb-amt" value="' + amt + '"/></div>' +
+        '<div class="field"><label>Status</label><select id="eb-status"><option' + (status === 'Pending' ? ' selected' : '') + '>Pending</option><option' + (status === 'Paid' ? ' selected' : '') + '>Paid</option></select></div>' +
+        '<div class="field"><label>Payment Mode</label><select id="eb-mode">' + mOpts + '</select></div>',
+        function () {
+          put('/bills/' + id, { total_amount: v('eb-amt'), payment_status: v('eb-status'), payment_mode: v('eb-mode') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadBills() });
+        });
+    }
+    function delBill(id) {
+      if (!confirm('Delete bill #' + id + '?')) return;
+      del('/bills/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadBills() });
+    }
+
+    // ════════════════════════════════
+    // ROOMS
+    // ════════════════════════════════
+    function loadRooms() {
+      get('/rooms', function (rows) {
+        setCount('room-count', rows.length);
+        var html = '';
+        rows.forEach(function (r) {
+          var sel = session.role === 'admin'
+            ? '<select class="room-sel" onchange="quickUpdateRoom(' + r.room_id + ',this.value)">' +
+            ['Available', 'Occupied', 'Under Maintenance'].map(function (s) { return '<option' + (s === r.status ? ' selected' : '') + '>' + s + '</option>' }).join('') + '</select>'
+            : '-';
+          var actions = '';
+          if (session.role === 'patient') {
+            actions = r.status === 'Available'
+              ? ab('Book', 'ab-edit', 'bookRoom(' + r.room_id + ')')
+              : '<span style="color:#64748b">Not available</span>';
+          } else {
+            actions = ab('Edit', 'ab-edit', 'editRoom(' + r.room_id + ',\'' + r.room_number + '\',\'' + r.room_type + '\',' + r.floor + ',\'' + r.status + '\',' + r.daily_charge + ')') +
+              ab('Del', 'ab-del', 'delRoom(' + r.room_id + ')');
+          }
+          html += '<tr><td><b>' + r.room_number + '</b></td><td>' + badge(r.room_type || '-', 'bb') + '</td><td>' + r.floor + '</td>' +
+            '<td>₹' + Number(r.daily_charge).toLocaleString('en-IN') + '</td>' +
+            '<td>' + statusBadge(r.status) + '</td><td>' + sel + '</td>' +
+            '<td>' + actions + '</td></tr>';
+        });
+        document.getElementById('room-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No rooms</div></td></tr>';
+      });
+    }
+    function addRoom() {
+      var num = v('rm-num'), type = v('rm-type'), status = v('rm-status'), hid = v('rm-hid');
+      if (!num || !type || !status || !hid) { toast('Fill all required fields', true); return }
+      post('/rooms', {
+        room_number: num, room_type: type, floor: vn('rm-floor') || 0,
+        status: status, daily_charge: vn('rm-charge') || 0, hospital_id: hid
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Room ID: ' + r.room_id); refreshAutoIds(); loadRooms() });
+    }
+    function quickUpdateRoom(id, status) {
+      put('/rooms/' + id, { status: status }, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadRooms() });
+    }
+    function bookRoom(id) {
+      put('/rooms/' + id, { status: 'Occupied' }, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadRooms() });
+    }
+    function editRoom(id, num, type, floor, status, charge) {
+      var types = ['General', 'Semi-Private', 'Private', 'ICU', 'NICU', 'Operation Theatre', 'Emergency'];
+      var tOpts = types.map(function (t) { return '<option' + (t === type ? ' selected' : '') + '>' + t + '</option>' }).join('');
+      var statuses = ['Available', 'Occupied', 'Under Maintenance'];
+      var sOpts = statuses.map(function (s) { return '<option' + (s === status ? ' selected' : '') + '>' + s + '</option>' }).join('');
+      openModal('Edit Room',
+        '<div class="fr2"><div class="field"><label>Room Number</label><input id="er-num" value="' + num + '"/></div>' +
+        '<div class="field"><label>Floor</label><input type="number" id="er-floor" value="' + floor + '"/></div></div>' +
+        '<div class="field"><label>Type</label><select id="er-type">' + tOpts + '</select></div>' +
+        '<div class="fr2"><div class="field"><label>Status</label><select id="er-status">' + sOpts + '</select></div>' +
+        '<div class="field"><label>Daily Charge (₹)</label><input type="number" id="er-charge" value="' + charge + '"/></div></div>',
+        function () {
+          put('/rooms/' + id, {
+            room_number: v('er-num'), room_type: v('er-type'), floor: vn('er-floor'),
+            status: v('er-status'), daily_charge: vn('er-charge')
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadRooms() });
+        });
+    }
+    function delRoom(id) {
+      if (!confirm('Delete room #' + id + '?')) return;
+      del('/rooms/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadRooms() });
+    }
+
+    // ════════════════════════════════
+    // ADMISSIONS
+    // ════════════════════════════════
+    function loadAdmissions() {
+      get('/admissions', function (rows) {
+        setCount('admit-count', rows.length);
+        var html = '';
+        rows.forEach(function (a) {
+          html += '<tr><td>' + a.admission_id + '</td><td>' + a.patient_name + '</td><td>' + a.doctor_name + '</td>' +
+            '<td>' + a.room_number + '</td><td>' + fmtDate(a.admission_date) + '</td>' +
+            '<td>' + (a.discharge_date ? fmtDate(a.discharge_date) : badge('Admitted', 'bo')) + '</td>' +
+            '<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + a.reason + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editAdmission(' + a.admission_id + ',\'' + fmtDate(a.discharge_date || '') + '\',\'' + a.reason.replace(/'/g, "\\'") + '\')') +
+            ab('Del', 'ab-del', 'delAdmission(' + a.admission_id + ')') + '</td></tr>';
+        });
+        document.getElementById('admit-tbody').innerHTML = html || '<tr><td colspan="8"><div class="empty">No admissions</div></td></tr>';
+      });
+    }
+    function addAdmission() {
+      var pid = v('ad-pid'), did = v('ad-did'), rid = v('ad-rid'), adate = v('ad-adate'), reason = v('ad-reason');
+      if (!pid || !did || !rid || !adate || !reason) { toast('Fill all required fields', true); return }
+      post('/admissions', {
+        patient_id: pid, doctor_id: did, room_id: rid,
+        admission_date: adate, discharge_date: v('ad-ddate') || null, reason: reason
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Admission ID: ' + r.admission_id); refreshAutoIds(); loadAdmissions() });
+    }
+    function editAdmission(id, discharge, reason) {
+      openModal('Edit Admission',
+        '<div class="field"><label>Discharge Date (blank = still admitted)</label><input type="date" id="ead-disc" value="' + discharge + '"/></div>' +
+        '<div class="field"><label>Reason</label><textarea id="ead-reason">' + reason + '</textarea></div>',
+        function () {
+          put('/admissions/' + id, { discharge_date: v('ead-disc') || null, reason: v('ead-reason') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadAdmissions() });
+        });
+    }
+    function delAdmission(id) {
+      if (!confirm('Delete admission #' + id + '?')) return;
+      del('/admissions/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadAdmissions() });
+    }
+
+    // ════════════════════════════════
+    // PHARMACY
+    // ════════════════════════════════
+    function loadPharmacy() {
+      get('/pharmacy', function (rows) {
+        setCount('pharma-count', rows.length);
+        var html = '';
+        rows.forEach(function (m) {
+          var stockCell = m.stock_quantity < 50 ? '<span class="low-stock">⚠ ' + m.stock_quantity + '</span>' : m.stock_quantity;
+          html += '<tr><td>' + m.medication_id + '</td><td><b>' + m.name + '</b></td><td>' + badge(m.category || '-', 'bb') + '</td>' +
+            '<td>' + badge(m.unit || '-', 'bgr') + '</td><td>' + stockCell + '</td>' +
+            '<td>₹' + m.price_per_unit + '</td><td>' + fmtDate(m.expiry_date) + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editPharmacy(' + m.medication_id + ',\'' + m.name.replace(/'/g, "\\'") + '\',\'' +
+              (m.category || '') + '\',\'' + (m.unit || '') + '\',' + m.stock_quantity + ',' + m.price_per_unit + ',\'' + fmtDate(m.expiry_date) + '\')') +
+            ab('Del', 'ab-del', 'delPharmacy(' + m.medication_id + ')') + '</td></tr>';
+        });
+        document.getElementById('pharma-tbody').innerHTML = html || '<tr><td colspan="8"><div class="empty">No medicines</div></td></tr>';
+      });
+    }
+    function addPharmacy() {
+      var name = v('ph-name'), cat = v('ph-cat'), unit = v('ph-unit'), stock = v('ph-stock'), price = v('ph-price');
+      if (!name || !cat || !unit || stock === '' || price === '') { toast('Fill all required fields', true); return }
+      post('/pharmacy', { name: name, category: cat, unit: unit, stock_quantity: stock, price_per_unit: price, expiry_date: v('ph-expiry') || null },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Medication ID: ' + r.medication_id); refreshAutoIds(); loadPharmacy() });
+    }
+    function editPharmacy(id, name, cat, unit, stock, price, expiry) {
+      var names = ['Paracetamol 500mg', 'Ibuprofen 400mg', 'Amoxicillin 500mg', 'Azithromycin 500mg', 'Cetirizine 10mg', 'Pantoprazole 40mg', 'Metformin 500mg', 'Amlodipine 5mg', 'ORS', 'Vitamin C', 'Insulin', 'Other'];
+      if (names.indexOf(name) < 0) names.push(name);
+      var nOpts = names.map(function (n) { return '<option' + (n === name ? ' selected' : '') + '>' + n + '</option>' }).join('');
+      var cats = ['Antibiotic', 'Painkiller', 'Antiviral', 'Antifungal', 'Supplement', 'Vaccine', 'Steroid', 'Antacid', 'Antidiabetic', 'Antihypertensive', 'Other'];
+      var cOpts = cats.map(function (c) { return '<option' + (c === cat ? ' selected' : '') + '>' + c + '</option>' }).join('');
+      var units = ['mg', 'ml', 'tablet', 'capsule', 'syrup', 'injection', 'drop', 'cream', 'ointment'];
+      var uOpts = units.map(function (u) { return '<option' + (u === unit ? ' selected' : '') + '>' + u + '</option>' }).join('');
+      openModal('Edit Medicine',
+        '<div class="field"><label>Name *</label><select id="eph-name">' + nOpts + '</select></div>' +
+        '<div class="fr2"><div class="field"><label>Category</label><select id="eph-cat">' + cOpts + '</select></div>' +
+        '<div class="field"><label>Unit</label><select id="eph-unit">' + uOpts + '</select></div></div>' +
+        '<div class="fr2"><div class="field"><label>Stock</label><input type="number" id="eph-stock" value="' + stock + '"/></div>' +
+        '<div class="field"><label>Price/Unit (₹)</label><input type="number" id="eph-price" value="' + price + '"/></div></div>' +
+        '<div class="field"><label>Expiry Date</label><input type="date" id="eph-expiry" value="' + expiry + '"/></div>',
+        function () {
+          put('/pharmacy/' + id, {
+            name: v('eph-name'), category: v('eph-cat'), unit: v('eph-unit'),
+            stock_quantity: vn('eph-stock'), price_per_unit: vn('eph-price'), expiry_date: v('eph-expiry') || null
+          },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadPharmacy() });
+        });
+    }
+    function delPharmacy(id) {
+      if (!confirm('Delete medicine #' + id + '?')) return;
+      del('/pharmacy/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadPharmacy() });
+    }
+
+    // ════════════════════════════════
+    // TEST REPORTS
+    // ════════════════════════════════
+    function loadReports() {
+      get('/reports', function (rows) {
+        setCount('report-count', rows.length);
+        var html = '';
+        rows.forEach(function (r) {
+          html += '<tr><td>' + r.report_id + '</td><td>' + r.patient_name + '</td>' +
+            '<td>' + badge(r.test_name || '-', 'bb') + '</td><td>' + (r.result || '-') + '</td>' +
+            '<td>' + fmtDate(r.report_date) + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editReport(' + r.report_id + ',\'' + (r.result || '') + '\',\'' + fmtDate(r.report_date) + '\')') +
+            ab('Del', 'ab-del', 'delReport(' + r.report_id + ')') + '</td></tr>';
+        });
+        document.getElementById('report-tbody').innerHTML = html || '<tr><td colspan="6"><div class="empty">No reports</div></td></tr>';
+      });
+    }
+    function addReport() {
+      var tid = v('rp-tid'), test = v('rp-test'), date = v('rp-date');
+      if (!tid || !test || !date) { toast('Fill all required fields', true); return }
+      post('/reports', { treatment_id: tid, test_name: test, report_date: date, result: v('rp-result') || null },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Report ID: ' + r.report_id); refreshAutoIds(); loadReports() });
+    }
+    function editReport(id, result, date) {
+      openModal('Edit Test Report',
+        '<div class="field"><label>Result</label><input id="er-result" value="' + result + '"/></div>' +
+        '<div class="field"><label>Report Date</label><input type="date" id="er-date" value="' + date + '"/></div>',
+        function () {
+          put('/reports/' + id, { result: v('er-result') || null, report_date: v('er-date') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadReports() });
+        });
+    }
+    function delReport(id) {
+      if (!confirm('Delete report #' + id + '?')) return;
+      del('/reports/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadReports() });
+    }
+
+    // ════════════════════════════════
+    // PRESCRIPTIONS
+    // ════════════════════════════════
+    function loadPrescriptions() {
+      loadPrescriptionTreatmentOptions();
+      loadPrescriptionMedicineOptions();
+      get('/prescriptions', function (rows) {
+        setCount('presc-count', rows.length);
+        var html = '';
+        rows.forEach(function (p) {
+          html += '<tr><td>' + p.prescription_id + '</td><td>' + (p.diagnosis || '-') + '</td>' +
+            '<td>' + p.medicine_name + '</td><td>' + p.dosage + '</td>' +
+            '<td>' + badge(p.frequency, 'bgr') + '</td><td>' + p.duration_days + ' days</td><td>' + (p.quantity_prescribed || 1) + ' ' + (p.medicine_unit || '') + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editPresc(' + p.prescription_id + ',\'' + p.dosage.replace(/'/g, "\\'") + '\',\'' + p.frequency + '\',' + p.duration_days + ',' + (p.quantity_prescribed || 1) + ')') +
+            ab('Del', 'ab-del', 'delPresc(' + p.prescription_id + ')') + '</td></tr>';
+        });
+        document.getElementById('presc-tbody').innerHTML = html || '<tr><td colspan="8"><div class="empty">No prescriptions</div></td></tr>';
+      });
+    }
+    var bulkMedicines = [];
+    function addMedicineToBulkList() {
+      var mid = v('pr-mid'), dos = v('pr-dos'), freq = v('pr-freq'), dur = v('pr-dur'), qty = v('pr-qty');
+      if (!mid || !dos || !freq || !dur || !qty) { toast('Fill all medicine fields', true); return; }
+      
+      var select = document.getElementById('pr-mid');
+      var name = select.options[select.selectedIndex].text;
+      
+      bulkMedicines.push({
+        medicine_id: mid, name: name, dosage: dos, frequency: freq, duration_days: dur, quantity_prescribed: qty
+      });
+      
+      document.getElementById('pr-mid').value = '';
+      document.getElementById('pr-dos').value = '';
+      document.getElementById('pr-freq').value = '';
+      document.getElementById('pr-dur').value = '';
+      document.getElementById('pr-qty').value = '';
+      renderBulkMedicineList();
+    }
+
+    function removeBulkMedicine(index) {
+      bulkMedicines.splice(index, 1);
+      renderBulkMedicineList();
+    }
+
+    function renderBulkMedicineList() {
+      var tbody = document.getElementById('bulk-med-tbody');
+      if (!bulkMedicines.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px; color:var(--text-light)">Select a treatment and add medicines above</td></tr>';
+        return;
+      }
+      var html = '';
+      bulkMedicines.forEach(function(m, i) {
+        html += '<tr>' +
+          '<td>' + m.name + '</td>' +
+          '<td>' + m.dosage + '</td>' +
+          '<td>' + m.frequency + '</td>' +
+          '<td>' + m.duration_days + '</td>' +
+          '<td>' + m.quantity_prescribed + '</td>' +
+          '<td><button class="btn-cancel" style="padding:4px 8px; font-size:11px" onclick="removeBulkMedicine(' + i + ')">X</button></td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function submitBulkPrescription() {
+      var tid = v('pr-tid');
+      if (!tid) { toast('Please select a treatment first', true); return; }
+      if (!bulkMedicines.length) { toast('Please add at least one medicine to the list', true); return; }
+
+      post('/prescriptions/bulk', { treatment_id: tid, medicines: bulkMedicines },
+        function (r) { 
+          if (r.error) { toast(r.error, true); return; }
+          toast(r.message); 
+          bulkMedicines = [];
+          renderBulkMedicineList();
+          refreshAutoIds(); 
+          loadPrescriptions();
+        });
+    }
+
+    function addPrescription() {
+      submitBulkPrescription();
+    }
+    function editPresc(id, dosage, freq, dur, qty) {
+      var freqs = ['Once a day', 'Twice a day', 'Thrice a day', 'As needed', 'Weekly', 'Monthly'];
+      if (freqs.indexOf('Four times a day') < 0) freqs.splice(3, 0, 'Four times a day');
+      var fOpts = freqs.map(function (f) { return '<option' + (f === freq ? ' selected' : '') + '>' + f + '</option>' }).join('');
+      openModal('Edit Prescription',
+        '<div class="field"><label>Dosage</label><input id="epr-dos" value="' + dosage + '"/></div>' +
+        '<div class="fr2"><div class="field"><label>Frequency</label><select id="epr-freq">' + fOpts + '</select></div>' +
+        '<div class="field"><label>Duration (days)</label><input type="number" id="epr-dur" value="' + dur + '"/></div></div>' +
+        '<div class="field"><label>Quantity to Dispense</label><input type="number" id="epr-qty" value="' + qty + '" min="1"/></div>',
+        function () {
+          put('/prescriptions/' + id, { dosage: v('epr-dos'), frequency: v('epr-freq'), duration_days: vn('epr-dur'), quantity_prescribed: vn('epr-qty') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadPrescriptions() });
+        });
+    }
+    function delPresc(id) {
+      if (!confirm('Delete prescription #' + id + '?')) return;
+      del('/prescriptions/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadPrescriptions() });
+    }
+
+    // ════════════════════════════════
+    // INSURANCE
+    // ════════════════════════════════
+    function loadInsurance() {
+      get('/insurance', function (rows) {
+        setCount('ins-count', rows.length);
+        var html = '';
+        rows.forEach(function (i) {
+          html += '<tr><td>' + i.insurance_id + '</td><td>' + i.patient_name + '</td>' +
+            '<td>' + i.provider_name + '</td><td>' + badge(i.policy_number, 'bgr') + '</td>' +
+            '<td>₹' + Number(i.coverage_amount).toLocaleString('en-IN') + '</td>' +
+            '<td>' + fmtDate(i.expiry_date) + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editInsurance(' + i.insurance_id + ',\'' + i.provider_name.replace(/'/g, "\\'") + '\',' + i.coverage_amount + ',\'' + fmtDate(i.expiry_date) + '\')') +
+            ab('Del', 'ab-del', 'delInsurance(' + i.insurance_id + ')') + '</td></tr>';
+        });
+        document.getElementById('ins-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No insurance</div></td></tr>';
+      });
+    }
+    function addInsurance() {
+      var pid = v('ins-pid'), prov = v('ins-prov'), pol = v('ins-pol'), cov = v('ins-cov'), exp = v('ins-exp');
+      if (!pid || !prov || !pol || !cov || !exp) { toast('Fill all required fields', true); return }
+      post('/insurance', { patient_id: pid, provider_name: prov, policy_number: pol, coverage_amount: cov, expiry_date: exp },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Insurance ID: ' + r.insurance_id); refreshAutoIds(); loadInsurance() });
+    }
+    function editInsurance(id, prov, cov, exp) {
+      openModal('Edit Insurance',
+        '<div class="field"><label>Provider Name</label><input id="ei-prov" value="' + prov + '"/></div>' +
+        '<div class="field"><label>Coverage Amount (₹)</label><input type="number" id="ei-cov" value="' + cov + '"/></div>' +
+        '<div class="field"><label>Expiry Date</label><input type="date" id="ei-exp" value="' + exp + '"/></div>',
+        function () {
+          put('/insurance/' + id, { provider_name: v('ei-prov'), coverage_amount: vn('ei-cov'), expiry_date: v('ei-exp') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadInsurance() });
+        });
+    }
+    function delInsurance(id) {
+      if (!confirm('Delete insurance #' + id + '?')) return;
+      del('/insurance/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadInsurance() });
+    }
+
+    // ════════════════════════════════
+    // EMERGENCY CONTACTS
+    // ════════════════════════════════
+    function loadContacts() {
+      get('/emergency-contacts', function (rows) {
+        setCount('ec-count', rows.length);
+        var html = '';
+        rows.forEach(function (c) {
+          html += '<tr><td>' + c.contact_id + '</td><td>' + c.patient_name + '</td>' +
+            '<td><b>' + c.name + '</b></td><td>' + badge(c.relationship, 'bgr') + '</td><td>' + c.phone + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editContact(' + c.contact_id + ',\'' + c.name.replace(/'/g, "\\'") + '\',\'' + c.relationship + '\',\'' + c.phone + '\')') +
+            ab('Del', 'ab-del', 'delContact(' + c.contact_id + ')') + '</td></tr>';
+        });
+        document.getElementById('ec-tbody').innerHTML = html || '<tr><td colspan="6"><div class="empty">No contacts</div></td></tr>';
+      });
+    }
+    function addContact() {
+      var pid = session.role === 'patient' ? session.id : v('ec-pid');
+      var name = v('ec-name'), rel = v('ec-rel'), phone = v('ec-phone');
+      if (!pid || !name || !rel || !phone) { toast('Fill all required fields', true); return }
+      if (badPhone(phone)) { toast('Phone must be 10 digits', true); return }
+      post('/emergency-contacts', { patient_id: pid, name: name, relationship: rel, phone: phone },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Contact ID: ' + r.contact_id); refreshAutoIds(); loadContacts() });
+    }
+    function editContact(id, name, rel, phone) {
+      var rels = ['Spouse', 'Parent', 'Child', 'Sibling', 'Friend', 'Guardian', 'Other'];
+      var rOpts = rels.map(function (r) { return '<option' + (r === rel ? ' selected' : '') + '>' + r + '</option>' }).join('');
+      openModal('Edit Emergency Contact',
+        '<div class="field"><label>Name</label><input id="ec2-name" value="' + name + '"/></div>' +
+        '<div class="field"><label>Relationship</label><select id="ec2-rel">' + rOpts + '</select></div>' +
+        '<div class="field"><label>Phone (10 digits)</label><input id="ec2-phone" value="' + phone + '"/></div>',
+        function () {
+          put('/emergency-contacts/' + id, { name: v('ec2-name'), relationship: v('ec2-rel'), phone: v('ec2-phone') },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadContacts() });
+        });
+    }
+    function delContact(id) {
+      if (!confirm('Delete contact #' + id + '?')) return;
+      del('/emergency-contacts/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadContacts() });
+    }
+
+    // ════════════════════════════════
+    // FEEDBACK
+    // ════════════════════════════════
+    function loadFeedback() {
+      get('/feedback', function (rows) {
+        setCount('fb-count', rows.length);
+        var html = '';
+        rows.forEach(function (f) {
+          var rc = f.rating >= 7 ? 'bg' : f.rating >= 4 ? 'bo' : 'br';
+          html += '<tr><td>' + f.feedback_id + '</td><td>' + f.patient_name + '</td>' +
+            '<td>' + (f.doctor_name || '-') + '</td>' +
+            '<td>' + badge(f.rating + '/10', rc) + '</td>' +
+            '<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (f.comments || '-') + '</td>' +
+            '<td>' + fmtDate(f.feedback_date) + '</td>' +
+            '<td>' + ab('Edit', 'ab-edit', 'editFeedback(' + f.feedback_id + ',' + f.rating + ',\'' + (f.comments || '').replace(/'/g, "\\'") + '\')') +
+            ab('Del', 'ab-del', 'delFeedback(' + f.feedback_id + ')') + '</td></tr>';
+        });
+        document.getElementById('fb-tbody').innerHTML = html || '<tr><td colspan="7"><div class="empty">No feedback</div></td></tr>';
+      });
+    }
+    function addFeedback() {
+      var pid = session.role === 'patient' ? session.id : v('fb-pid');
+      var doctorId = session.role === 'patient' ? v('fb-did-select') : v('fb-did');
+      var hospitalId = session.role === 'patient' ? v('fb-hid-select') : v('fb-hid');
+      var rating = v('fb-rating'), date = v('fb-date');
+      if (!pid || rating === '' || !date) { toast('Fill all required fields', true); return }
+      if (isNaN(rating) || Number(rating) < 0 || Number(rating) > 10) { toast('Rating must be 0–10', true); return }
+      post('/feedback', {
+        patient_id: pid, rating: rating, feedback_date: date,
+        comments: v('fb-comments') || null, doctor_id: doctorId || null, hospital_id: hospitalId || null
+      },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message + ' Feedback ID: ' + r.feedback_id); refreshAutoIds(); loadFeedback() });
+    }
+    function editFeedback(id, rating, comments) {
+      openModal('Edit Feedback',
+        '<div class="field"><label>Rating (0–10)</label><input type="number" id="ef-rating" value="' + rating + '" min="0" max="10"/></div>' +
+        '<div class="field"><label>Comments</label><textarea id="ef-comments">' + comments + '</textarea></div>',
+        function () {
+          put('/feedback/' + id, { rating: vn('ef-rating'), comments: v('ef-comments') || null },
+            function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); closeModal(); loadFeedback() });
+        });
+    }
+    function delFeedback(id) {
+      if (!confirm('Delete feedback #' + id + '?')) return;
+      del('/feedback/' + id, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadFeedback() });
+    }
+
+    // ════════════════════════════════
+    // NURSE-TREATMENT
+    // ════════════════════════════════
+    function loadNurseTreat() {
+      get('/nurse-treatments', function (rows) {
+        setCount('nt-count', rows.length);
+        var html = '';
+        rows.forEach(function (r) {
+          html += '<tr><td>' + r.nurse_id + '</td><td>' + r.nurse_name + '</td>' +
+            '<td>' + r.treatment_id + '</td><td>' + (r.diagnosis || '-') + '</td>' +
+            '<td>' + ab('Del', 'ab-del', 'delNurseTreat(' + r.nurse_id + ',' + r.treatment_id + ')') + '</td></tr>';
+        });
+        document.getElementById('nt-tbody').innerHTML = html || '<tr><td colspan="5"><div class="empty">No assignments</div></td></tr>';
+      });
+    }
+    function addNurseTreat() {
+      var nid = v('nt-nid'), tid = v('nt-tid');
+      if (!nid || !tid) { toast('Fill both fields', true); return }
+      post('/nurse-treatments', { nurse_id: nid, treatment_id: tid },
+        function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadNurseTreat() });
+    }
+    function delNurseTreat(nid, tid) {
+      if (!confirm('Remove nurse ' + nid + ' from treatment ' + tid + '?')) return;
+      del('/nurse-treatments/' + nid + '/' + tid, function (r) { if (r.error) { toast(r.error, true); return } toast(r.message); loadNurseTreat() });
+    }
+
+    // Role-based UI initialization
+    applyRoleUI();
+    show(canSeePage('dashboard') ? 'dashboard' : cfg.pages[0]);
+  </script>
+</body>
+
+</html>
